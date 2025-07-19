@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, LoginCredentials, AuthResponse } from '@/types';
-import { api, setToken, removeToken, getToken, endpoints } from '@/services/api';
+import { setToken, removeToken, getToken } from '@/services/api';
+import { MockApiService } from '@/services/mockApi';
 import { toast } from '@/hooks/use-toast';
 
 interface AuthContextType {
@@ -55,8 +56,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: LoginCredentials) => {
     try {
       setIsLoading(true);
-      const response = await api.post<AuthResponse>(endpoints.login, credentials);
-      const { user, token } = response.data;
+      const authResponse = await MockApiService.login(credentials);
+      const { user, token } = authResponse;
 
       setToken(token);
       setUser(user);
@@ -66,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         description: `Bienvenue, ${user.name}`,
       });
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Erreur de connexion';
+      const message = error.message || 'Erreur de connexion';
       toast({
         title: 'Erreur de connexion',
         description: message,
@@ -80,7 +81,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     try {
-      api.post(endpoints.logout).catch(() => {
+      MockApiService.logout().catch(() => {
         // Ignore logout errors - user is logging out anyway
       });
     } finally {
@@ -95,8 +96,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUser = async () => {
     try {
-      const response = await api.get<{ user: User }>(endpoints.profile);
-      setUser(response.data.user);
+      const response = await MockApiService.getProfile();
+      setUser(response.user);
     } catch (error) {
       removeToken();
       setUser(null);

@@ -1,39 +1,41 @@
-import { useState } from 'react';
-import { Navigate, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Eye, EyeOff, Building2, Loader2 } from 'lucide-react';
+import { Loader2, LogIn, Shield } from 'lucide-react';
+import cotonouImage from '@/assets/cotonou-municipal-building.jpg';
 
 export const LoginPage = () => {
   const { login, isAuthenticated, isLoading } = useAuth();
   const [credentials, setCredentials] = useState({
     email: '',
-    password: '',
+    password: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [loginError, setLoginError] = useState('');
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/app/dashboard" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoginError('');
+    if (!credentials.email || !credentials.password) {
+      setError('Veuillez remplir tous les champs');
+      return;
+    }
+
     setIsSubmitting(true);
+    setError('');
 
     try {
       await login(credentials);
-    } catch (error: any) {
-      setLoginError(
-        error.response?.data?.message || 
-        'Email ou mot de passe incorrect'
-      );
+    } catch (err: any) {
+      setError(err.message || 'Erreur de connexion');
     } finally {
       setIsSubmitting(false);
     }
@@ -43,10 +45,9 @@ export const LoginPage = () => {
     const { name, value } = e.target;
     setCredentials(prev => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
-    // Clear error when user starts typing
-    if (loginError) setLoginError('');
+    if (error) setError('');
   };
 
   if (isLoading) {
@@ -61,114 +62,105 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-light to-secondary-light p-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-municipal-gradient rounded-xl mx-auto mb-4 flex items-center justify-center shadow-lg">
-            <Building2 className="h-8 w-8 text-white" />
+    <div className="min-h-screen flex">
+      <div className="hidden lg:flex lg:w-1/2 bg-primary">
+        <div 
+          className="w-full bg-cover bg-center relative"
+          style={{ backgroundImage: `url(${cotonouImage})` }}
+        >
+          <div className="absolute inset-0 bg-primary/80 flex items-center justify-center">
+            <div className="text-center text-white p-8">
+              <Shield className="h-16 w-16 mx-auto mb-4" />
+              <h1 className="text-3xl font-bold mb-4">
+                Système de Gestion de Fourrière
+              </h1>
+              <p className="text-lg opacity-90">
+                Mairie de Cotonou - Accès sécurisé
+              </p>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">
-            Fourrière Municipale
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Mairie de Cotonou - Système de Gestion
-          </p>
         </div>
+      </div>
 
-        {/* Login Form */}
-        <Card className="shadow-2xl border-0 bg-card/95 backdrop-blur">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-xl font-semibold text-center">
-              Connexion
-            </CardTitle>
-            <CardDescription className="text-center">
-              Entrez vos identifiants pour accéder au système
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {loginError && (
-                <Alert variant="destructive">
-                  <AlertDescription>{loginError}</AlertDescription>
-                </Alert>
-              )}
+      <div className="flex-1 flex items-center justify-center p-8 bg-background">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <LogIn className="h-12 w-12 mx-auto mb-4 text-primary" />
+            <h1 className="text-2xl font-bold text-foreground">Connexion</h1>
+            <p className="text-muted-foreground mt-2">
+              Accédez à votre espace de travail
+            </p>
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="nom@mairie-cotonou.bj"
-                  value={credentials.email}
-                  onChange={handleInputChange}
-                  required
-                  disabled={isSubmitting}
-                  className="h-11"
-                />
-              </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-center">Authentification</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
-                <div className="relative">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={credentials.email}
+                    onChange={handleInputChange}
+                    placeholder="votre.email@cotonou.bj"
+                    disabled={isSubmitting}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">Mot de passe</Label>
                   <Input
                     id="password"
                     name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Votre mot de passe"
+                    type="password"
                     value={credentials.password}
                     onChange={handleInputChange}
+                    placeholder="Votre mot de passe"
+                    disabled={isSubmitting}
                     required
-                    disabled={isSubmitting}
-                    className="h-11 pr-10"
                   />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => setShowPassword(!showPassword)}
-                    disabled={isSubmitting}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </button>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Connexion...
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Se connecter
+                    </>
+                  )}
+                </Button>
+              </form>
+
+              <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+                <h3 className="font-medium text-sm mb-2">Comptes de démonstration :</h3>
+                <div className="space-y-2 text-xs">
+                  <div><strong>Admin:</strong> admin@cotonou.bj / admin123</div>
+                  <div><strong>Agent:</strong> agent@cotonou.bj / agent123</div>
+                  <div><strong>Finance:</strong> finance@cotonou.bj / finance123</div>
                 </div>
               </div>
-
-              <Button
-                type="submit"
-                className="w-full h-11 bg-municipal-gradient hover:opacity-90 transition-opacity"
-                disabled={isSubmitting || !credentials.email || !credentials.password}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Connexion...
-                  </>
-                ) : (
-                  'Se connecter'
-                )}
-              </Button>
-
-              <div className="text-center">
-                <Link
-                  to="/change-password"
-                  className="text-sm text-primary hover:text-primary-hover underline"
-                >
-                  Mot de passe oublié ?
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Footer */}
-        <div className="text-center mt-8 text-sm text-muted-foreground">
-          <p>© 2024 Mairie de Cotonou</p>
-          <p>Système de Gestion de la Fourrière Municipale</p>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
