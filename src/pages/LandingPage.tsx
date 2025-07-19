@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Car, Users, FileText, BarChart3, Shield, Building2 } from 'lucide-react';
+import { ArrowRight, Car, Users, FileText, BarChart3, Shield, Building2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -59,12 +59,6 @@ export const LandingPage = () => {
             <Button variant="ghost" asChild>
               <Link to="/login">Connexion</Link>
             </Button>
-            <Button variant="municipal" asChild>
-              <Link to="/login">
-                Accéder au système
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
           </div>
         </div>
       </nav>
@@ -89,15 +83,12 @@ export const LandingPage = () => {
                 </p>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" variant="municipal" asChild>
-                  <Link to="/login">
-                    Démarrer maintenant
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                  <Link to="/vehicule-lookup">
+                    <Car className="mr-2 h-5 w-5" />
+                    Consulter mon véhicule
                   </Link>
-                </Button>
-                <Button size="lg" variant="outline">
-                  Découvrir les fonctionnalités
                 </Button>
               </div>
 
@@ -169,22 +160,19 @@ export const LandingPage = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
-                Prêt à moderniser votre fourrière ?
+                Votre véhicule est-il en fourrière ?
               </h2>
               <p className="text-xl text-muted-foreground">
-                Rejoignez la transformation numérique de la Mairie de Cotonou
+                Vérifiez rapidement l'état de votre véhicule avec votre numéro d'immatriculation
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button size="lg" variant="municipal" asChild>
-                <Link to="/login">
-                  <Shield className="mr-2 h-5 w-5" />
-                  Accès sécurisé
+                <Link to="/vehicule-lookup">
+                  <Search className="mr-2 h-5 w-5" />
+                  Rechercher mon véhicule
                 </Link>
-              </Button>
-              <Button size="lg" variant="outline">
-                Contacter le support
               </Button>
             </div>
           </div>

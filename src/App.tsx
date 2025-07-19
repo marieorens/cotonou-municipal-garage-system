@@ -8,11 +8,17 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { LoginPage } from "@/pages/LoginPage";
 import { LandingPage } from "@/pages/LandingPage";
+import { VehicleLookupPage } from "@/pages/VehicleLookupPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { VehiclesListPage } from "@/pages/VehiclesListPage";
 import { VehicleFormPage } from "@/pages/VehicleFormPage";
 import { VehicleDetailPage } from "@/pages/VehicleDetailPage";
 import { OwnersPage } from "@/pages/OwnersPage";
+import { ProceduresPage } from "@/pages/ProceduresPage";
+import { PaymentsPage } from "@/pages/PaymentsPage";
+import { NotificationsPage } from "@/pages/NotificationsPage";
+import { UsersPage } from "@/pages/UsersPage";
+import { SettingsPage } from "@/pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +33,12 @@ const App = () => (
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/vehicule-lookup" element={<VehicleLookupPage />} />
             <Route path="/login" element={<LoginPage />} />
+            
+            {/* Legacy redirects for old URLs */}
+            <Route path="/vehicules" element={<Navigate to="/app/vehicules" replace />} />
+            <Route path="/proprietaires" element={<Navigate to="/app/proprietaires" replace />} />
             
             {/* Protected routes */}
             <Route path="/app" element={
@@ -52,27 +63,27 @@ const App = () => (
               <Route path="proprietaires" element={<OwnersPage />} />
               <Route path="procedures" element={
                 <ProtectedRoute roles={['admin', 'agent']}>
-                  <div className="p-6"><h1 className="text-2xl font-bold">Procédures</h1><p className="text-muted-foreground">Page en cours de développement</p></div>
+                  <ProceduresPage />
                 </ProtectedRoute>
               } />
               <Route path="paiements" element={
                 <ProtectedRoute roles={['admin', 'finance']}>
-                  <div className="p-6"><h1 className="text-2xl font-bold">Paiements</h1><p className="text-muted-foreground">Page en cours de développement</p></div>
+                  <PaymentsPage />
                 </ProtectedRoute>
               } />
               <Route path="notifications" element={
                 <ProtectedRoute roles={['admin', 'agent']}>
-                  <div className="p-6"><h1 className="text-2xl font-bold">Notifications</h1><p className="text-muted-foreground">Page en cours de développement</p></div>
+                  <NotificationsPage />
                 </ProtectedRoute>
               } />
               <Route path="admin/utilisateurs" element={
                 <ProtectedRoute roles={['admin']}>
-                  <div className="p-6"><h1 className="text-2xl font-bold">Gestion des utilisateurs</h1><p className="text-muted-foreground">Page en cours de développement</p></div>
+                  <UsersPage />
                 </ProtectedRoute>
               } />
               <Route path="parametres" element={
                 <ProtectedRoute roles={['admin']}>
-                  <div className="p-6"><h1 className="text-2xl font-bold">Paramètres</h1><p className="text-muted-foreground">Page en cours de développement</p></div>
+                  <SettingsPage />
                 </ProtectedRoute>
               } />
             </Route>
