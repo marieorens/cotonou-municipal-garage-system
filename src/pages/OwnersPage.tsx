@@ -101,7 +101,10 @@ export const OwnersPage = () => {
           </p>
         </div>
         {canEditOwners && (
-          <Button className="bg-municipal-gradient hover:opacity-90">
+          <Button 
+            className="bg-municipal-gradient hover:opacity-90"
+            onClick={() => console.log('Créer nouveau propriétaire')}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Nouveau propriétaire
           </Button>
@@ -229,13 +232,28 @@ export const OwnersPage = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => console.log('Voir profil propriétaire', owner.id)}
+                          title="Voir profil"
+                        >
                           <User className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => console.log('Voir véhicules propriétaire', owner.id)}
+                          title="Voir véhicules"
+                        >
                           <Car className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => console.log('Voir historique propriétaire', owner.id)}
+                          title="Voir historique"
+                        >
                           <History className="h-4 w-4" />
                         </Button>
                       </div>

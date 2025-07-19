@@ -43,7 +43,12 @@ export const AppHeader = () => {
         {/* Right section */}
         <div className="flex items-center gap-4">
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative"
+            onClick={() => navigate('/app/notifications')}
+          >
             <Bell className="h-4 w-4" />
             <Badge
               variant="destructive"

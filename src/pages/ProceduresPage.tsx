@@ -153,7 +153,12 @@ export const ProceduresPage = () => {
             />
           </div>
           {(user?.role === 'admin' || user?.role === 'agent') && (
-            <Button>
+            <Button
+              onClick={() => {
+                console.log('Créer nouvelle procédure');
+                // Redirect to form or open modal
+              }}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Nouvelle procédure
             </Button>

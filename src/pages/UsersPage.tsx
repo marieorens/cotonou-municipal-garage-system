@@ -231,7 +231,15 @@ export const UsersPage = () => {
                     <Label htmlFor="password">Mot de passe temporaire</Label>
                     <Input id="password" type="password" placeholder="Mot de passe" />
                   </div>
-                  <Button className="w-full">Créer l'utilisateur</Button>
+                  <Button 
+                    className="w-full"
+                    onClick={() => {
+                      console.log('Créer utilisateur');
+                      setIsDialogOpen(false);
+                    }}
+                  >
+                    Créer l'utilisateur
+                  </Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -266,19 +274,39 @@ export const UsersPage = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => console.log('Modifier utilisateur', user.id)}
+                            title="Modifier"
+                          >
                             <Edit className="w-3 h-3" />
                           </Button>
                           {user.status === 'active' ? (
-                            <Button size="sm" variant="outline">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => console.log('Désactiver utilisateur', user.id)}
+                              title="Désactiver"
+                            >
                               <UserX className="w-3 h-3" />
                             </Button>
                           ) : (
-                            <Button size="sm" variant="outline">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => console.log('Activer utilisateur', user.id)}
+                              title="Activer"
+                            >
                               <UserCheck className="w-3 h-3" />
                             </Button>
                           )}
-                          <Button size="sm" variant="destructive">
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => console.log('Supprimer utilisateur', user.id)}
+                            title="Supprimer"
+                          >
                             <Trash2 className="w-3 h-3" />
                           </Button>
                         </div>

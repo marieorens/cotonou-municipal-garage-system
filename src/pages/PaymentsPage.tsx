@@ -153,9 +153,33 @@ export const PaymentsPage = () => {
         </Select>
         
         {(user?.role === 'admin' || user?.role === 'finance') && (
-          <Button variant="outline">
+          <Button 
+            variant="outline"
+            onClick={() => {
+              const csvData = payments.map(p => ({
+                Reference: p.reference,
+                Montant: p.amount,
+                Methode: p.payment_method,
+                Date: new Date(p.payment_date).toLocaleDateString('fr-FR'),
+                Description: p.description
+              }));
+              
+              const csv = [
+                Object.keys(csvData[0]).join(','),
+                ...csvData.map(row => Object.values(row).join(','))
+              ].join('\n');
+              
+              const blob = new Blob([csv], { type: 'text/csv' });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `paiements_${new Date().toLocaleDateString('fr-FR')}.csv`;
+              a.click();
+              window.URL.revokeObjectURL(url);
+            }}
+          >
             <Download className="w-4 h-4 mr-2" />
-            Exporter
+            Exporter CSV
           </Button>
         )}
       </div>

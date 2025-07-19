@@ -100,11 +100,11 @@ export const ProfilePage = () => {
                 </Avatar>
                 <div>
                   <CardTitle className="text-xl">{user?.name}</CardTitle>
-                  <CardDescription className="flex items-center gap-2">
+                  <div className="flex items-center gap-2">
                     {getRoleBadge(user?.role)}
                     <span>•</span>
-                    <span>Connecté depuis: {new Date().toLocaleDateString('fr-FR')}</span>
-                  </CardDescription>
+                    <span className="text-muted-foreground">Connecté depuis: {new Date().toLocaleDateString('fr-FR')}</span>
+                  </div>
                 </div>
               </div>
               <Button

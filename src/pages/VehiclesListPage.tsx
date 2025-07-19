@@ -257,13 +257,37 @@ export const VehiclesListPage = () => {
           <div className="flex items-center justify-between">
             <CardTitle>Liste des véhicules</CardTitle>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  const csvData = filteredVehicles.map(v => ({
+                    Plaque: v.license_plate,
+                    Marque: v.make,
+                    Modele: v.model,
+                    Type: v.type,
+                    Statut: v.status,
+                    Date_Fourriere: new Date(v.impound_date).toLocaleDateString('fr-FR'),
+                    Localisation: v.location,
+                    Valeur: v.estimated_value
+                  }));
+                  
+                  const csv = [
+                    Object.keys(csvData[0]).join(','),
+                    ...csvData.map(row => Object.values(row).join(','))
+                  ].join('\n');
+                  
+                  const blob = new Blob([csv], { type: 'text/csv' });
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `vehicules_${new Date().toLocaleDateString('fr-FR')}.csv`;
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                }}
+              >
                 <Download className="mr-2 h-4 w-4" />
                 Exporter CSV
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="mr-2 h-4 w-4" />
-                Exporter PDF
               </Button>
             </div>
           </div>
@@ -322,7 +346,12 @@ export const VehiclesListPage = () => {
                             </Link>
                           </Button>
                         )}
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => console.log('Générer QR Code pour véhicule', vehicle.id)}
+                          title="Générer QR Code"
+                        >
                           <QrCode className="h-4 w-4" />
                         </Button>
                       </div>
