@@ -7,10 +7,12 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { LoginPage } from "@/pages/LoginPage";
+import { LandingPage } from "@/pages/LandingPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { VehiclesListPage } from "@/pages/VehiclesListPage";
 import { VehicleFormPage } from "@/pages/VehicleFormPage";
 import { VehicleDetailPage } from "@/pages/VehicleDetailPage";
+import { OwnersPage } from "@/pages/OwnersPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,15 +26,16 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             {/* Public routes */}
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             
             {/* Protected routes */}
-            <Route path="/" element={
+            <Route path="/app" element={
               <ProtectedRoute>
                 <AppLayout />
               </ProtectedRoute>
             }>
-              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route index element={<Navigate to="/app/dashboard" replace />} />
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="vehicules" element={<VehiclesListPage />} />
               <Route path="vehicules/nouveau" element={
@@ -46,7 +49,7 @@ const App = () => (
                 </ProtectedRoute>
               } />
               <Route path="vehicules/:id" element={<VehicleDetailPage />} />
-              <Route path="proprietaires" element={<div className="p-6"><h1 className="text-2xl font-bold">Propriétaires</h1><p className="text-muted-foreground">Page en cours de développement</p></div>} />
+              <Route path="proprietaires" element={<OwnersPage />} />
               <Route path="procedures" element={
                 <ProtectedRoute roles={['admin', 'agent']}>
                   <div className="p-6"><h1 className="text-2xl font-bold">Procédures</h1><p className="text-muted-foreground">Page en cours de développement</p></div>

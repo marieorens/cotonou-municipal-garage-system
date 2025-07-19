@@ -29,37 +29,37 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 const navigationItems = [
   {
     title: 'Dashboard',
-    url: '/dashboard',
+    url: '/app/dashboard',
     icon: BarChart3,
     roles: ['admin', 'agent', 'finance'],
   },
   {
     title: 'Véhicules',
-    url: '/vehicules',
+    url: '/app/vehicules',
     icon: Car,
     roles: ['admin', 'agent', 'finance'],
   },
   {
     title: 'Propriétaires',
-    url: '/proprietaires',
+    url: '/app/proprietaires',
     icon: Users,
     roles: ['admin', 'agent', 'finance'],
   },
   {
     title: 'Procédures',
-    url: '/procedures',
+    url: '/app/procedures',
     icon: FileText,
     roles: ['admin', 'agent'],
   },
   {
     title: 'Paiements',
-    url: '/paiements',
+    url: '/app/paiements',
     icon: CreditCard,
     roles: ['admin', 'finance'],
   },
   {
     title: 'Notifications',
-    url: '/notifications',
+    url: '/app/notifications',
     icon: Bell,
     roles: ['admin', 'agent'],
   },
@@ -68,13 +68,13 @@ const navigationItems = [
 const adminItems = [
   {
     title: 'Utilisateurs',
-    url: '/admin/utilisateurs',
+    url: '/app/admin/utilisateurs',
     icon: Shield,
     roles: ['admin'],
   },
   {
     title: 'Paramètres',
-    url: '/parametres',
+    url: '/app/parametres',
     icon: Settings,
     roles: ['admin'],
   },
