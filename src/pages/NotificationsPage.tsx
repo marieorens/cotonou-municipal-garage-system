@@ -71,7 +71,7 @@ export const NotificationsPage = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'sent':
-        return <Badge variant="secondary" className="bg-green-100 text-green-800">Envoyé</Badge>;
+        return <Badge variant="secondary" className="bg-success-light text-success">Envoyé</Badge>;
       case 'pending':
         return <Badge variant="default">En attente</Badge>;
       case 'failed':
@@ -220,7 +220,7 @@ export const NotificationsPage = () => {
                 <CardDescription>Envoyés avec succès</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-600">{sentCount}</div>
+                <div className="text-2xl font-bold text-success">{sentCount}</div>
               </CardContent>
             </Card>
             <Card>
@@ -228,7 +228,7 @@ export const NotificationsPage = () => {
                 <CardDescription>En attente</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{pendingCount}</div>
+                <div className="text-2xl font-bold text-primary">{pendingCount}</div>
               </CardContent>
             </Card>
             <Card>
@@ -236,7 +236,7 @@ export const NotificationsPage = () => {
                 <CardDescription>Échecs</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-red-600">{failedCount}</div>
+                <div className="text-2xl font-bold text-destructive">{failedCount}</div>
               </CardContent>
             </Card>
           </div>

@@ -165,7 +165,7 @@ export const VehicleDetailPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate('/vehicules')}>
+          <Button variant="ghost" onClick={() => navigate('/app/vehicules')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -184,7 +184,7 @@ export const VehicleDetailPage = () => {
           </Badge>
           {canEdit && (
             <Button variant="outline" asChild>
-              <Link to={`/vehicules/${vehicle.id}/edit`}>
+              <Link to={`/app/vehicules/${vehicle.id}/edit`}>
                 <Edit className="h-4 w-4 mr-2" />
                 Modifier
               </Link>

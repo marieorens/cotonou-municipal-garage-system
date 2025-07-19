@@ -157,7 +157,7 @@ export const VehiclesListPage = () => {
         </div>
         {canEditVehicles && (
           <Button asChild className="bg-municipal-gradient hover:opacity-90">
-            <Link to="/vehicules/nouveau">
+            <Link to="/app/vehicules/nouveau">
               <Plus className="mr-2 h-4 w-4" />
               Nouveau véhicule
             </Link>
@@ -311,13 +311,13 @@ export const VehiclesListPage = () => {
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Button variant="ghost" size="sm" asChild>
-                          <Link to={`/vehicules/${vehicle.id}`}>
+                          <Link to={`/app/vehicules/${vehicle.id}`}>
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>
                         {canEditVehicles && (
                           <Button variant="ghost" size="sm" asChild>
-                            <Link to={`/vehicules/${vehicle.id}/edit`}>
+                            <Link to={`/app/vehicules/${vehicle.id}/edit`}>
                               <Edit className="h-4 w-4" />
                             </Link>
                           </Button>

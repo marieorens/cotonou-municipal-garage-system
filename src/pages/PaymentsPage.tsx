@@ -67,7 +67,7 @@ export const PaymentsPage = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'paid':
-        return <Badge variant="secondary" className="bg-green-100 text-green-800">Payé</Badge>;
+        return <Badge variant="secondary" className="bg-success-light text-success">Payé</Badge>;
       case 'pending':
         return <Badge variant="destructive">En attente</Badge>;
       case 'overdue':
@@ -112,7 +112,7 @@ export const PaymentsPage = () => {
             <CardDescription>Revenus encaissés</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-success">
               {totalRevenue.toLocaleString()} FCFA
             </div>
           </CardContent>
@@ -123,7 +123,7 @@ export const PaymentsPage = () => {
             <CardDescription>En attente de paiement</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
+            <div className="text-2xl font-bold text-warning">
               {pendingAmount.toLocaleString()} FCFA
             </div>
           </CardContent>

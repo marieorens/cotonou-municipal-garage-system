@@ -89,7 +89,7 @@ export const UsersPage = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge variant="secondary" className="bg-green-100 text-green-800">Actif</Badge>;
+        return <Badge variant="secondary" className="bg-success-light text-success">Actif</Badge>;
       case 'inactive':
         return <Badge variant="destructive">Inactif</Badge>;
       default:
@@ -143,7 +143,7 @@ export const UsersPage = () => {
                 <CardDescription>Utilisateurs actifs</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-600">{activeUsers}</div>
+                <div className="text-2xl font-bold text-success">{activeUsers}</div>
               </CardContent>
             </Card>
             <Card>
@@ -151,7 +151,7 @@ export const UsersPage = () => {
                 <CardDescription>Utilisateurs inactifs</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-red-600">{inactiveUsers}</div>
+                <div className="text-2xl font-bold text-destructive">{inactiveUsers}</div>
               </CardContent>
             </Card>
           </div>

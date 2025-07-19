@@ -103,7 +103,7 @@ export const VehicleFormPage = () => {
         description: `Le véhicule ${formData.license_plate} a été ${isEdit ? 'modifié' : 'enregistré'} avec succès.`,
       });
       
-      navigate('/vehicules');
+      navigate('/app/vehicules');
     } catch (error) {
       toast({
         title: 'Erreur',
@@ -129,7 +129,7 @@ export const VehicleFormPage = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={() => navigate('/vehicules')}>
+        <Button variant="ghost" onClick={() => navigate('/app/vehicules')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -321,7 +321,7 @@ export const VehicleFormPage = () => {
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate('/vehicules')}
+            onClick={() => navigate('/app/vehicules')}
             disabled={isSubmitting}
           >
             Annuler

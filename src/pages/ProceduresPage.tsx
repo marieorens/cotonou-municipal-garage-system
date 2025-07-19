@@ -64,11 +64,11 @@ export const ProceduresPage = () => {
   const getStepIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="w-4 h-4 text-success" />;
       case 'in_progress':
-        return <Clock className="w-4 h-4 text-blue-500" />;
+        return <Clock className="w-4 h-4 text-primary" />;
       default:
-        return <AlertCircle className="w-4 h-4 text-gray-400" />;
+        return <AlertCircle className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
@@ -122,7 +122,7 @@ export const ProceduresPage = () => {
                       <span>Progression</span>
                       <span>{procedure.progress}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-muted rounded-full h-2">
                       <div 
                         className="bg-primary h-2 rounded-full transition-all duration-300" 
                         style={{ width: `${procedure.progress}%` }}
@@ -132,8 +132,8 @@ export const ProceduresPage = () => {
                       {procedure.steps.map((step, index) => (
                         <div key={index} className="flex items-center gap-2 text-xs">
                           {getStepIcon(step.status)}
-                          <span className={step.status === 'completed' ? 'text-green-600' : 
-                                        step.status === 'in_progress' ? 'text-blue-600' : 'text-gray-500'}>
+                          <span className={step.status === 'completed' ? 'text-success' : 
+                                        step.status === 'in_progress' ? 'text-primary' : 'text-muted-foreground'}>
                             {step.name}
                           </span>
                         </div>

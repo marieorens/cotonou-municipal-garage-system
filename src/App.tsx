@@ -20,6 +20,7 @@ import { NotificationsPage } from "@/pages/NotificationsPage";
 import { UsersPage } from "@/pages/UsersPage";
 import { SettingsPage } from "@/pages/SettingsPage";
 import { ChangePasswordPage } from "@/pages/ChangePasswordPage";
+import { ProfilePage } from "@/pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,11 @@ const App = () => (
             <Route path="/" element={<LandingPage />} />
             <Route path="/vehicule-lookup" element={<VehicleLookupPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            } />
             
             {/* Legacy redirects for old URLs */}
             <Route path="/vehicules" element={<Navigate to="/app/vehicules" replace />} />
