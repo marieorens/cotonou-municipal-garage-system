@@ -93,16 +93,16 @@ export const OwnersPage = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Propriétaires</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Propriétaires</h1>
           <p className="text-muted-foreground">
             Gestion de la base de données des propriétaires de véhicules
           </p>
         </div>
         {canEditOwners && (
           <Button 
-            className="bg-municipal-gradient hover:opacity-90"
+            className="bg-municipal-gradient hover:opacity-90 w-full sm:w-auto"
             onClick={() => console.log('Créer nouveau propriétaire')}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -133,7 +133,7 @@ export const OwnersPage = () => {
       </Card>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold">{filteredOwners.length}</div>
@@ -173,16 +173,16 @@ export const OwnersPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Propriétaire</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Adresse</TableHead>
-                  <TableHead>Pièce d'identité</TableHead>
-                  <TableHead>Date d'ajout</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="min-w-[180px]">Propriétaire</TableHead>
+                  <TableHead className="min-w-[150px]">Contact</TableHead>
+                  <TableHead className="hidden md:table-cell min-w-[200px]">Adresse</TableHead>
+                  <TableHead className="hidden lg:table-cell min-w-[150px]">Pièce d'identité</TableHead>
+                  <TableHead className="hidden sm:table-cell">Date d'ajout</TableHead>
+                  <TableHead className="min-w-[120px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -216,10 +216,10 @@ export const OwnersPage = () => {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <p className="text-sm">{owner.address}</p>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden lg:table-cell">
                       <div className="space-y-1">
                         <Badge variant="outline">
                           {getIdTypeLabel(owner.id_type)}
@@ -227,7 +227,7 @@ export const OwnersPage = () => {
                         <p className="text-sm text-muted-foreground">{owner.id_number}</p>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       {new Date(owner.created_at).toLocaleDateString('fr-FR')}
                     </TableCell>
                     <TableCell>

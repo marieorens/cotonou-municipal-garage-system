@@ -134,7 +134,7 @@ export const DashboardPage = () => {
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <StatusCard
           title="Véhicules totaux"
           value={stats.total_vehicles}
@@ -165,11 +165,11 @@ export const DashboardPage = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
         {/* Status Distribution */}
-        <Card className="lg:col-span-2">
+        <Card className="xl:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-lg">
               <TrendingUp className="h-5 w-5" />
               Répartition des véhicules
             </CardTitle>
@@ -249,19 +249,19 @@ export const DashboardPage = () => {
         <CardContent>
           <div className="space-y-4">
             {recentVehicles.map((vehicle) => (
-              <div key={vehicle.id} className="flex items-center justify-between p-4 border rounded-lg">
+              <div key={vehicle.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Car className="h-6 w-6 text-primary" />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="font-medium">{vehicle.license_plate}</p>
                     <p className="text-sm text-muted-foreground">
                       {vehicle.make} {vehicle.model} - {vehicle.color}
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right flex-shrink-0">
                   <Badge variant={getStatusVariant(vehicle.status)}>
                     {getStatusLabel(vehicle.status)}
                   </Badge>

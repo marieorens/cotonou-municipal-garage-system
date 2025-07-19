@@ -99,9 +99,9 @@ export const NotificationsPage = () => {
   const failedCount = notifications.filter(n => n.status === 'failed').length;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Notifications</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Notifications</h1>
         <p className="text-muted-foreground">Gestion des communications avec les propriétaires</p>
       </div>
 
@@ -208,7 +208,7 @@ export const NotificationsPage = () => {
         {/* History Tab */}
         <TabsContent value="history" className="space-y-6">
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Total envoyés</CardDescription>
@@ -249,18 +249,19 @@ export const NotificationsPage = () => {
               <CardTitle>Historique des notifications</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Canal</TableHead>
-                    <TableHead>Destinataire</TableHead>
-                    <TableHead>Message</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead>Date</TableHead>
-                  </TableRow>
-                </TableHeader>
+              <div className="overflow-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[80px]">ID</TableHead>
+                      <TableHead className="hidden sm:table-cell min-w-[120px]">Type</TableHead>
+                      <TableHead className="min-w-[80px]">Canal</TableHead>
+                      <TableHead className="hidden md:table-cell min-w-[120px]">Destinataire</TableHead>
+                      <TableHead className="hidden lg:table-cell min-w-[200px]">Message</TableHead>
+                      <TableHead className="min-w-[80px]">Statut</TableHead>
+                      <TableHead className="hidden sm:table-cell">Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
                 <TableBody>
                   {loading ? (
                     <TableRow>
@@ -278,24 +279,25 @@ export const NotificationsPage = () => {
                     notifications.map((notification) => (
                       <TableRow key={notification.id}>
                         <TableCell className="font-medium">{notification.id}</TableCell>
-                        <TableCell>{getTypeLabel(notification.type)}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{getTypeLabel(notification.type)}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             {getTypeIcon(notification.channel)}
-                            <span className="capitalize">{notification.channel}</span>
+                            <span className="hidden sm:inline capitalize">{notification.channel}</span>
                           </div>
                         </TableCell>
-                        <TableCell>{notification.recipient}</TableCell>
-                        <TableCell className="max-w-xs truncate">{notification.message}</TableCell>
+                        <TableCell className="hidden md:table-cell">{notification.recipient}</TableCell>
+                        <TableCell className="hidden lg:table-cell max-w-xs truncate">{notification.message}</TableCell>
                         <TableCell>{getStatusBadge(notification.status)}</TableCell>
-                        <TableCell>
+                        <TableCell className="hidden sm:table-cell">
                           {new Date(notification.sent_at).toLocaleDateString('fr-FR')}
                         </TableCell>
                       </TableRow>
                     ))
                   )}
                 </TableBody>
-              </Table>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

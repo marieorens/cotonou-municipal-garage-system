@@ -148,15 +148,15 @@ export const VehiclesListPage = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Véhicules</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Véhicules</h1>
           <p className="text-muted-foreground">
             Gestion des véhicules en fourrière
           </p>
         </div>
         {canEditVehicles && (
-          <Button asChild className="bg-municipal-gradient hover:opacity-90">
+          <Button asChild className="bg-municipal-gradient hover:opacity-90 w-full sm:w-auto">
             <Link to="/app/vehicules/nouveau">
               <Plus className="mr-2 h-4 w-4" />
               Nouveau véhicule
@@ -174,8 +174,8 @@ export const VehiclesListPage = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="sm:col-span-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -218,7 +218,7 @@ export const VehiclesListPage = () => {
       </Card>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold">{filteredVehicles.length}</div>
@@ -293,18 +293,18 @@ export const VehiclesListPage = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Plaque</TableHead>
-                  <TableHead>Véhicule</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Date mise en fourrière</TableHead>
-                  <TableHead>Localisation</TableHead>
-                  <TableHead>Valeur estimée</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="min-w-[120px]">Plaque</TableHead>
+                  <TableHead className="min-w-[160px]">Véhicule</TableHead>
+                  <TableHead className="hidden sm:table-cell">Type</TableHead>
+                  <TableHead className="min-w-[100px]">Statut</TableHead>
+                  <TableHead className="hidden md:table-cell min-w-[140px]">Date mise en fourrière</TableHead>
+                  <TableHead className="hidden lg:table-cell">Localisation</TableHead>
+                  <TableHead className="hidden xl:table-cell min-w-[120px]">Valeur estimée</TableHead>
+                  <TableHead className="min-w-[100px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -321,28 +321,28 @@ export const VehiclesListPage = () => {
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell>{getTypeLabel(vehicle.type)}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{getTypeLabel(vehicle.type)}</TableCell>
                     <TableCell>
-                      <Badge variant={getStatusVariant(vehicle.status)}>
+                      <Badge variant={getStatusVariant(vehicle.status)} className="text-xs">
                         {getStatusLabel(vehicle.status)}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       {new Date(vehicle.impound_date).toLocaleDateString('fr-FR')}
                     </TableCell>
-                    <TableCell>{vehicle.location}</TableCell>
-                    <TableCell>{formatCurrency(vehicle.estimated_value)}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{vehicle.location}</TableCell>
+                    <TableCell className="hidden xl:table-cell">{formatCurrency(vehicle.estimated_value)}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Button variant="ghost" size="sm" asChild>
                           <Link to={`/app/vehicules/${vehicle.id}`}>
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Link>
                         </Button>
                         {canEditVehicles && (
                           <Button variant="ghost" size="sm" asChild>
                             <Link to={`/app/vehicules/${vehicle.id}/edit`}>
-                              <Edit className="h-4 w-4" />
+                              <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Link>
                           </Button>
                         )}
@@ -352,7 +352,7 @@ export const VehiclesListPage = () => {
                           onClick={() => console.log('Générer QR Code pour véhicule', vehicle.id)}
                           title="Générer QR Code"
                         >
-                          <QrCode className="h-4 w-4" />
+                          <QrCode className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
                     </TableCell>

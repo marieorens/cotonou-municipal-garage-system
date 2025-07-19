@@ -86,14 +86,14 @@ export const PaymentsPage = () => {
   ).length;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Paiements</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Paiements</h1>
         <p className="text-muted-foreground">Gestion des encaissements et facturation</p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Revenus total</CardDescription>
@@ -190,19 +190,20 @@ export const PaymentsPage = () => {
           <CardTitle>Historique des paiements</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Référence</TableHead>
-                <TableHead>Véhicule</TableHead>
-                <TableHead>Propriétaire</TableHead>
-                <TableHead>Montant</TableHead>
-                <TableHead>Méthode</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
+          <div className="overflow-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-[120px]">Référence</TableHead>
+                  <TableHead className="hidden sm:table-cell">Véhicule</TableHead>
+                  <TableHead className="hidden md:table-cell">Propriétaire</TableHead>
+                  <TableHead className="min-w-[100px]">Montant</TableHead>
+                  <TableHead className="hidden lg:table-cell">Méthode</TableHead>
+                  <TableHead className="hidden sm:table-cell">Date</TableHead>
+                  <TableHead className="min-w-[80px]">Statut</TableHead>
+                  <TableHead className="min-w-[60px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
@@ -220,18 +221,18 @@ export const PaymentsPage = () => {
                 filteredPayments.map((payment) => (
                   <TableRow key={payment.id}>
                     <TableCell className="font-medium">{payment.reference}</TableCell>
-                    <TableCell>ID: {payment.vehicle_id}</TableCell>
-                    <TableCell>ID: {payment.owner_id}</TableCell>
+                    <TableCell className="hidden sm:table-cell">ID: {payment.vehicle_id}</TableCell>
+                    <TableCell className="hidden md:table-cell">ID: {payment.owner_id}</TableCell>
                     <TableCell className="font-semibold">{formatCurrency(payment.amount)}</TableCell>
-                    <TableCell>
+                    <TableCell className="hidden lg:table-cell">
                       <div className="flex items-center gap-2">
                         {getMethodIcon(payment.payment_method)}
                         <span className="capitalize">{getMethodLabel(payment.payment_method)}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{new Date(payment.payment_date).toLocaleDateString('fr-FR')}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{new Date(payment.payment_date).toLocaleDateString('fr-FR')}</TableCell>
                     <TableCell>
-                      <Badge variant="secondary" className="bg-success-light text-success">
+                      <Badge variant="secondary" className="bg-success-light text-success text-xs">
                         Payé
                       </Badge>
                     </TableCell>
@@ -248,7 +249,8 @@ export const PaymentsPage = () => {
                 ))
               )}
             </TableBody>
-          </Table>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

@@ -114,14 +114,14 @@ export const UsersPage = () => {
   const inactiveUsers = mockUsers.filter(u => u.status === 'inactive').length;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Gestion des utilisateurs</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Gestion des utilisateurs</h1>
         <p className="text-muted-foreground">Administration des comptes et des rôles</p>
       </div>
 
       <Tabs defaultValue="users" className="space-y-6">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="users">Utilisateurs</TabsTrigger>
           <TabsTrigger value="roles">Rôles et permissions</TabsTrigger>
         </TabsList>
@@ -129,7 +129,7 @@ export const UsersPage = () => {
         {/* Users Tab */}
         <TabsContent value="users" className="space-y-6">
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Total utilisateurs</CardDescription>
@@ -251,29 +251,30 @@ export const UsersPage = () => {
               <CardTitle>Liste des utilisateurs</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nom</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Rôle</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead>Dernière connexion</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
+              <div className="overflow-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[150px]">Nom</TableHead>
+                      <TableHead className="hidden sm:table-cell min-w-[200px]">Email</TableHead>
+                      <TableHead className="min-w-[100px]">Rôle</TableHead>
+                      <TableHead className="min-w-[80px]">Statut</TableHead>
+                      <TableHead className="hidden md:table-cell">Dernière connexion</TableHead>
+                      <TableHead className="min-w-[120px]">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
                 <TableBody>
                   {filteredUsers.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{user.email}</TableCell>
                       <TableCell>{getRoleBadge(user.role)}</TableCell>
                       <TableCell>{getStatusBadge(user.status)}</TableCell>
-                      <TableCell>
+                      <TableCell className="hidden md:table-cell">
                         {new Date(user.lastLogin).toLocaleDateString('fr-FR')}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <Button 
                             size="sm" 
                             variant="outline"
@@ -314,7 +315,8 @@ export const UsersPage = () => {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

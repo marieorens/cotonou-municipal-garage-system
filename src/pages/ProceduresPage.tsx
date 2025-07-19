@@ -90,14 +90,14 @@ export const ProceduresPage = () => {
   const pendingCount = procedures.filter(p => p.status === 'pending').length;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Procédures</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Procédures</h1>
         <p className="text-muted-foreground">Gestion des procédures administratives</p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Total procédures</CardDescription>
@@ -203,7 +203,7 @@ export const ProceduresPage = () => {
                       </div>
                       <Progress value={getProgressValue(procedure.status)} className="w-full" />
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                         <div>
                           <span className="text-sm text-muted-foreground">Frais calculés:</span>
                           <p className="font-medium">{formatCurrency(procedure.fees_calculated)}</p>

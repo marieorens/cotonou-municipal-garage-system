@@ -44,18 +44,18 @@ export const SettingsPage = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Paramètres</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Paramètres</h1>
         <p className="text-muted-foreground">Configuration du système de fourrière</p>
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="general">Général</TabsTrigger>
-          <TabsTrigger value="tariffs">Tarifs</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-2">
+          <TabsTrigger value="general" className="text-xs sm:text-sm">Général</TabsTrigger>
+          <TabsTrigger value="tariffs" className="text-xs sm:text-sm">Tarifs</TabsTrigger>
+          <TabsTrigger value="notifications" className="text-xs sm:text-sm">Notifications</TabsTrigger>
+          <TabsTrigger value="documents" className="text-xs sm:text-sm">Documents</TabsTrigger>
         </TabsList>
 
         {/* General Settings */}
@@ -69,7 +69,7 @@ export const SettingsPage = () => {
               <CardDescription>Configuration de base du système</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="siteName">Nom du site</Label>
                   <Input
@@ -143,7 +143,7 @@ export const SettingsPage = () => {
               <CardDescription>Configuration des tarifs de la fourrière</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="carDaily">Voiture particulière (FCFA/jour)</Label>
                   <Input
@@ -192,7 +192,7 @@ export const SettingsPage = () => {
                     })}
                   />
                 </div>
-                <div className="md:col-span-2">
+                <div className="sm:col-span-2">
                   <Label htmlFor="processingFee">Frais de dossier (FCFA)</Label>
                   <Input
                     id="processingFee"
