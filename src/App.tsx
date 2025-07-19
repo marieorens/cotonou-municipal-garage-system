@@ -19,6 +19,7 @@ import { PaymentsPage } from "@/pages/PaymentsPage";
 import { NotificationsPage } from "@/pages/NotificationsPage";
 import { UsersPage } from "@/pages/UsersPage";
 import { SettingsPage } from "@/pages/SettingsPage";
+import { ChangePasswordPage } from "@/pages/ChangePasswordPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -86,6 +87,7 @@ const App = () => (
                   <SettingsPage />
                 </ProtectedRoute>
               } />
+              <Route path="change-password" element={<ChangePasswordPage />} />
             </Route>
             
             {/* Catch-all route */}

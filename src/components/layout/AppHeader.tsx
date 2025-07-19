@@ -84,7 +84,7 @@ export const AppHeader = () => {
                 <User className="mr-2 h-4 w-4" />
                 <span>Profil</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/change-password')}>
+              <DropdownMenuItem onClick={() => navigate('/app/change-password')}>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Changer mot de passe</span>
               </DropdownMenuItem>
