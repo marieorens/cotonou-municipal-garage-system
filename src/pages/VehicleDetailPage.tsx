@@ -9,6 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Vehicle, Owner } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { MockApiService } from '@/services/mockApi';
+import { useToast } from '@/hooks/use-toast';
 import municipalBuilding from '@/assets/cotonou-municipal-building.jpg';
 
 // Mock data
@@ -68,10 +70,58 @@ export const VehicleDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { hasAnyRole } = useAuth();
-  const [vehicle, setVehicle] = useState<Vehicle>(mockVehicle);
-  const [owner, setOwner] = useState<Owner | null>(mockOwner);
+  const { toast } = useToast();
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [owner, setOwner] = useState<Owner | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVehicle = async () => {
+      if (!id) return;
+      
+      try {
+        setIsLoading(true);
+        const response = await MockApiService.getVehicle(id);
+        setVehicle(response.vehicle);
+        setOwner(response.owner);
+      } catch (error) {
+        console.error('Failed to fetch vehicle:', error);
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de charger les détails du véhicule',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVehicle();
+  }, [id, toast]);
 
   const canEdit = hasAnyRole(['admin', 'agent']);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!vehicle) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Véhicule introuvable</h2>
+          <p className="text-muted-foreground mb-4">Le véhicule demandé n'existe pas.</p>
+          <Button onClick={() => navigate('/app/vehicules')}>
+            Retour à la liste
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {

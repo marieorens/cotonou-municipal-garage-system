@@ -106,8 +106,14 @@ const mockOwners: Owner[] = [
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class MockApiService {
-  private static currentUser: User | null = null;
-  private static token: string | null = null;
+  private static getStoredUser(): User | null {
+    const userStr = sessionStorage.getItem('demo_current_user');
+    return userStr ? JSON.parse(userStr) : null;
+  }
+
+  private static getStoredToken(): string | null {
+    return sessionStorage.getItem('demo_auth_token');
+  }
 
   // Authentication
   static async login(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -121,8 +127,10 @@ export class MockApiService {
     }
 
     const token = `mock_token_${Date.now()}_${user.id}`;
-    this.currentUser = user;
-    this.token = token;
+    
+    // Store in session storage
+    sessionStorage.setItem('demo_current_user', JSON.stringify(user));
+    sessionStorage.setItem('demo_auth_token', token);
 
     return {
       user,
@@ -133,47 +141,100 @@ export class MockApiService {
 
   static async logout(): Promise<void> {
     await delay(300);
-    this.currentUser = null;
-    this.token = null;
+    sessionStorage.removeItem('demo_current_user');
+    sessionStorage.removeItem('demo_auth_token');
   }
 
   static async getProfile(): Promise<{ user: User }> {
     await delay(400);
     
-    if (!this.currentUser || !this.token) {
+    const user = this.getStoredUser();
+    const token = this.getStoredToken();
+    
+    if (!user || !token) {
       throw new Error('Non authentifié');
     }
 
-    return { user: this.currentUser };
+    return { user };
   }
 
   // Vehicles
-  static async getVehicles(filters?: any): Promise<Vehicle[]> {
+  static async getVehicles(filters?: any): Promise<{ vehicles: Vehicle[] }> {
     await delay(600);
-    return mockVehicles;
+    return { vehicles: mockVehicles };
   }
 
-  static async getVehicle(id: string): Promise<Vehicle> {
+  static async getVehicle(id: string): Promise<{ vehicle: Vehicle; owner: Owner }> {
     await delay(400);
     const vehicle = mockVehicles.find(v => v.id === id);
     if (!vehicle) {
       throw new Error('Véhicule non trouvé');
     }
-    return vehicle;
+    // Find owner by linking vehicle to first available owner (demo purposes)
+    const owner = mockOwners[0]; // Simple demo logic
+    return { vehicle, owner };
   }
 
-  static async searchVehicleByPlate(plate: string): Promise<Vehicle | null> {
+  static async searchVehicleByPlate(plate: string): Promise<{ vehicle: Vehicle; owner: Owner } | null> {
     await delay(500);
     const vehicle = mockVehicles.find(v => 
-      v.license_plate.toLowerCase().includes(plate.toLowerCase())
+      v.license_plate.toLowerCase().replace(/[-\s]/g, '') === 
+      plate.toLowerCase().replace(/[-\s]/g, '')
     );
-    return vehicle || null;
+    if (!vehicle) {
+      return null;
+    }
+    const owner = mockOwners[0]; // Simple demo logic
+    return { vehicle, owner };
+  }
+
+  static async createVehicle(vehicleData: Partial<Vehicle>): Promise<{ vehicle: Vehicle }> {
+    await delay(600);
+    const newVehicle: Vehicle = {
+      id: (mockVehicles.length + 1).toString(),
+      license_plate: vehicleData.license_plate || '',
+      make: vehicleData.make || '',
+      model: vehicleData.model || '',
+      color: vehicleData.color || '',
+      year: vehicleData.year || new Date().getFullYear(),
+      type: vehicleData.type || 'car',
+      status: vehicleData.status || 'impounded',
+      impound_date: vehicleData.impound_date || new Date().toISOString(),
+      location: vehicleData.location || 'Zone A - Emplacement TBD',
+      photos: [],
+      estimated_value: vehicleData.estimated_value || 0,
+      description: vehicleData.description || '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    mockVehicles.push(newVehicle);
+    return { vehicle: newVehicle };
+  }
+
+  static async updateVehicle(id: string, vehicleData: Partial<Vehicle>): Promise<{ vehicle: Vehicle }> {
+    await delay(600);
+    const index = mockVehicles.findIndex(v => v.id === id);
+    if (index === -1) {
+      throw new Error('Véhicule non trouvé');
+    }
+    const updatedVehicle = { ...mockVehicles[index], ...vehicleData, updated_at: new Date().toISOString() };
+    mockVehicles[index] = updatedVehicle;
+    return { vehicle: updatedVehicle };
   }
 
   // Owners
-  static async getOwners(): Promise<Owner[]> {
+  static async getOwners(): Promise<{ owners: Owner[] }> {
     await delay(500);
-    return mockOwners;
+    return { owners: mockOwners };
+  }
+
+  static async getOwner(id: string): Promise<{ owner: Owner }> {
+    await delay(400);
+    const owner = mockOwners.find(o => o.id === id);
+    if (!owner) {
+      throw new Error('Propriétaire non trouvé');
+    }
+    return { owner };
   }
 
   // Dashboard stats
@@ -213,11 +274,12 @@ export class MockApiService {
   }
 
   // Users (admin only)
-  static async getUsers(): Promise<User[]> {
+  static async getUsers(): Promise<{ users: User[] }> {
     await delay(500);
-    if (this.currentUser?.role !== 'admin') {
+    const currentUser = this.getStoredUser();
+    if (currentUser?.role !== 'admin') {
       throw new Error('Accès non autorisé');
     }
-    return mockUsers;
+    return { users: mockUsers };
   }
 }
