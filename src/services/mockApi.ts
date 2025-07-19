@@ -255,22 +255,118 @@ export class MockApiService {
     };
   }
 
-  // Procedures (mock empty arrays for now)
+  // Procedures with mock data
   static async getProcedures(): Promise<Procedure[]> {
     await delay(500);
-    return [];
+    return [
+      {
+        id: '1',
+        vehicle_id: '1',
+        type: 'release',
+        status: 'pending',
+        documents: [
+          {
+            id: '1',
+            name: 'Carte grise',
+            type: 'pdf',
+            url: '/documents/carte_grise_1.pdf',
+            uploaded_at: new Date().toISOString()
+          }
+        ],
+        fees_calculated: 45000,
+        created_by: '1',
+        created_at: '2024-01-15T10:30:00Z',
+        updated_at: '2024-01-15T10:30:00Z',
+      },
+      {
+        id: '2',
+        vehicle_id: '2',
+        type: 'sale',
+        status: 'in_progress',
+        documents: [],
+        fees_calculated: 125000,
+        created_by: '1',
+        created_at: '2024-01-14T14:20:00Z',
+        updated_at: '2024-01-14T14:20:00Z',
+      }
+    ];
   }
 
-  // Payments (mock empty arrays for now)
+  // Payments with mock data
   static async getPayments(): Promise<Payment[]> {
     await delay(500);
-    return [];
+    return [
+      {
+        id: '1',
+        vehicle_id: '1',
+        owner_id: '1',
+        amount: 45000,
+        payment_method: 'cash',
+        payment_date: '2024-01-15T14:30:00Z',
+        reference: 'PAY-2024-001',
+        description: 'Frais de fourrière - Toyota Corolla AA-123-BC',
+        created_at: '2024-01-15T14:30:00Z',
+        updated_at: '2024-01-15T14:30:00Z',
+      },
+      {
+        id: '2',
+        vehicle_id: '2',
+        owner_id: '2',
+        amount: 32000,
+        payment_method: 'mobile_money',
+        payment_date: '2024-01-14T16:45:00Z',
+        reference: 'PAY-2024-002',
+        description: 'Frais de fourrière - Honda Civic BB-456-DE',
+        created_at: '2024-01-14T16:45:00Z',
+        updated_at: '2024-01-14T16:45:00Z',
+      },
+      {
+        id: '3',
+        vehicle_id: '1',
+        owner_id: '1',
+        amount: 125000,
+        payment_method: 'bank_transfer',
+        payment_date: '2024-01-13T11:15:00Z',
+        reference: 'PAY-2024-003',
+        description: 'Amende et frais de procédure',
+        created_at: '2024-01-13T11:15:00Z',
+        updated_at: '2024-01-13T11:15:00Z',
+      }
+    ];
   }
 
-  // Notifications (mock empty arrays for now)
+  // Notifications with mock data
   static async getNotifications(): Promise<Notification[]> {
     await delay(500);
-    return [];
+    return [
+      {
+        id: '1',
+        recipient: '+229 97 12 34 56',
+        type: 'impound_notice',
+        channel: 'sms',
+        message: 'Votre véhicule AA-123-BC a été mis en fourrière. Contactez-nous au 21 30 04 00.',
+        sent_at: '2024-01-15T10:45:00Z',
+        status: 'sent',
+      },
+      {
+        id: '2',
+        recipient: 'jean.dupont@email.com',
+        type: 'deadline_warning',
+        channel: 'email',
+        message: 'Dernier rappel: votre véhicule sera vendu dans 48h si les frais ne sont pas réglés.',
+        sent_at: '2024-01-14T09:00:00Z',
+        status: 'sent',
+      },
+      {
+        id: '3',
+        recipient: '+229 96 98 76 54',
+        type: 'payment_reminder',
+        channel: 'sms',
+        message: 'Rappel: frais de fourrière impayés pour le véhicule BB-456-DE.',
+        sent_at: '2024-01-13T15:30:00Z',
+        status: 'failed',
+      }
+    ];
   }
 
   // Users (admin only)

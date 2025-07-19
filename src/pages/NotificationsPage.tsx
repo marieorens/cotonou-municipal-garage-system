@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Send, MessageSquare, Mail, Smartphone, Bell, Users, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,39 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-const mockNotifications = [
-  {
-    id: 'NOT001',
-    type: 'sms',
-    recipient: 'ADJOVI Jean',
-    phone: '+229 96 12 34 56',
-    message: 'Votre véhicule AA 1234 AB est en fourrière. Délai légal: 15 jours.',
-    status: 'sent',
-    sentAt: '2024-01-15T10:30:00',
-    vehicleId: 'VH001'
-  },
-  {
-    id: 'NOT002',
-    type: 'email',
-    recipient: 'KOSSOU Marie',
-    email: 'marie.kossou@email.com',
-    message: 'Rappel: Votre véhicule BB 5678 CD doit être récupéré sous 3 jours.',
-    status: 'pending',
-    sentAt: null,
-    vehicleId: 'VH002'
-  },
-  {
-    id: 'NOT003',
-    type: 'sms',
-    recipient: 'TOGBE Paul',
-    phone: '+229 97 65 43 21',
-    message: 'Fin de délai légal pour votre véhicule CC 9012 EF. Procédure de vente engagée.',
-    status: 'failed',
-    sentAt: '2024-01-14T15:45:00',
-    vehicleId: 'VH003'
-  }
-];
+import { MockApiService } from '@/services/mockApi';
+import { Notification } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
 
 const notificationTemplates = [
   {
@@ -64,9 +34,28 @@ const notificationTemplates = [
 ];
 
 export const NotificationsPage = () => {
+  const { user } = useAuth();
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [customMessage, setCustomMessage] = useState('');
   const [notificationType, setNotificationType] = useState('sms');
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        setLoading(true);
+        const notificationsData = await MockApiService.getNotifications();
+        setNotifications(notificationsData);
+      } catch (error) {
+        console.error('Erreur lors du chargement des notifications:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -92,9 +81,22 @@ export const NotificationsPage = () => {
     }
   };
 
-  const sentCount = mockNotifications.filter(n => n.status === 'sent').length;
-  const pendingCount = mockNotifications.filter(n => n.status === 'pending').length;
-  const failedCount = mockNotifications.filter(n => n.status === 'failed').length;
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case 'impound_notice':
+        return 'Avis de mise en fourrière';
+      case 'deadline_warning':
+        return 'Avertissement de délai';
+      case 'payment_reminder':
+        return 'Rappel de paiement';
+      default:
+        return type;
+    }
+  };
+
+  const sentCount = notifications.filter(n => n.status === 'sent').length;
+  const pendingCount = notifications.filter(n => n.status === 'pending').length;
+  const failedCount = notifications.filter(n => n.status === 'failed').length;
 
   return (
     <div className="p-6 space-y-6">
@@ -212,7 +214,7 @@ export const NotificationsPage = () => {
                 <CardDescription>Total envoyés</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{mockNotifications.length}</div>
+                <div className="text-2xl font-bold">{notifications.length}</div>
               </CardContent>
             </Card>
             <Card>
@@ -252,6 +254,7 @@ export const NotificationsPage = () => {
                   <TableRow>
                     <TableHead>ID</TableHead>
                     <TableHead>Type</TableHead>
+                    <TableHead>Canal</TableHead>
                     <TableHead>Destinataire</TableHead>
                     <TableHead>Message</TableHead>
                     <TableHead>Statut</TableHead>
@@ -259,33 +262,38 @@ export const NotificationsPage = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mockNotifications.map((notification) => (
-                    <TableRow key={notification.id}>
-                      <TableCell className="font-medium">{notification.id}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {getTypeIcon(notification.type)}
-                          <span className="capitalize">{notification.type}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{notification.recipient}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {notification.phone || notification.email}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="max-w-xs truncate">{notification.message}</TableCell>
-                      <TableCell>{getStatusBadge(notification.status)}</TableCell>
-                      <TableCell>
-                        {notification.sentAt ? 
-                          new Date(notification.sentAt).toLocaleDateString('fr-FR') : 
-                          '-'
-                        }
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8">
+                        Chargement des notifications...
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : notifications.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8">
+                        Aucune notification trouvée
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    notifications.map((notification) => (
+                      <TableRow key={notification.id}>
+                        <TableCell className="font-medium">{notification.id}</TableCell>
+                        <TableCell>{getTypeLabel(notification.type)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {getTypeIcon(notification.channel)}
+                            <span className="capitalize">{notification.channel}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{notification.recipient}</TableCell>
+                        <TableCell className="max-w-xs truncate">{notification.message}</TableCell>
+                        <TableCell>{getStatusBadge(notification.status)}</TableCell>
+                        <TableCell>
+                          {new Date(notification.sent_at).toLocaleDateString('fr-FR')}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -303,9 +311,11 @@ export const NotificationsPage = () => {
                       <CardTitle className="text-lg">{template.name}</CardTitle>
                       <CardDescription>{template.subject}</CardDescription>
                     </div>
-                    <Button variant="outline" size="sm">
-                      Modifier
-                    </Button>
+                    {user?.role === 'admin' && (
+                      <Button variant="outline" size="sm">
+                        Modifier
+                      </Button>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
