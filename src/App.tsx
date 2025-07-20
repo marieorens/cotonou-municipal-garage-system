@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -27,81 +27,79 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/vehicule-lookup" element={<VehicleLookupPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <ProfilePage />
+    <AuthProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/vehicule-lookup" element={<VehicleLookupPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } />
+          
+          {/* Legacy redirects for old URLs */}
+          <Route path="/vehicules" element={<Navigate to="/app/vehicules" replace />} />
+          <Route path="/proprietaires" element={<Navigate to="/app/proprietaires" replace />} />
+          
+          {/* Protected routes */}
+          <Route path="/app" element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<Navigate to="/app/dashboard" replace />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="vehicules" element={<VehiclesListPage />} />
+            <Route path="vehicules/nouveau" element={
+              <ProtectedRoute roles={['admin', 'agent']}>
+                <VehicleFormPage />
               </ProtectedRoute>
             } />
-            
-            {/* Legacy redirects for old URLs */}
-            <Route path="/vehicules" element={<Navigate to="/app/vehicules" replace />} />
-            <Route path="/proprietaires" element={<Navigate to="/app/proprietaires" replace />} />
-            
-            {/* Protected routes */}
-            <Route path="/app" element={
-              <ProtectedRoute>
-                <AppLayout />
+            <Route path="vehicules/:id/edit" element={
+              <ProtectedRoute roles={['admin', 'agent']}>
+                <VehicleFormPage />
               </ProtectedRoute>
-            }>
-              <Route index element={<Navigate to="/app/dashboard" replace />} />
-              <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="vehicules" element={<VehiclesListPage />} />
-              <Route path="vehicules/nouveau" element={
-                <ProtectedRoute roles={['admin', 'agent']}>
-                  <VehicleFormPage />
-                </ProtectedRoute>
-              } />
-              <Route path="vehicules/:id/edit" element={
-                <ProtectedRoute roles={['admin', 'agent']}>
-                  <VehicleFormPage />
-                </ProtectedRoute>
-              } />
-              <Route path="vehicules/:id" element={<VehicleDetailPage />} />
-              <Route path="proprietaires" element={<OwnersPage />} />
-              <Route path="procedures" element={
-                <ProtectedRoute roles={['admin', 'agent']}>
-                  <ProceduresPage />
-                </ProtectedRoute>
-              } />
-              <Route path="paiements" element={
-                <ProtectedRoute roles={['admin', 'finance']}>
-                  <PaymentsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="notifications" element={
-                <ProtectedRoute roles={['admin', 'agent']}>
-                  <NotificationsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="admin/utilisateurs" element={
-                <ProtectedRoute roles={['admin']}>
-                  <UsersPage />
-                </ProtectedRoute>
-              } />
-              <Route path="parametres" element={
-                <ProtectedRoute roles={['admin']}>
-                  <SettingsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="change-password" element={<ChangePasswordPage />} />
-            </Route>
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
+            } />
+            <Route path="vehicules/:id" element={<VehicleDetailPage />} />
+            <Route path="proprietaires" element={<OwnersPage />} />
+            <Route path="procedures" element={
+              <ProtectedRoute roles={['admin', 'agent']}>
+                <ProceduresPage />
+              </ProtectedRoute>
+            } />
+            <Route path="paiements" element={
+              <ProtectedRoute roles={['admin', 'finance']}>
+                <PaymentsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="notifications" element={
+              <ProtectedRoute roles={['admin', 'agent']}>
+                <NotificationsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="admin/utilisateurs" element={
+              <ProtectedRoute roles={['admin']}>
+                <UsersPage />
+              </ProtectedRoute>
+            } />
+            <Route path="parametres" element={
+              <ProtectedRoute roles={['admin']}>
+                <SettingsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="change-password" element={<ChangePasswordPage />} />
+          </Route>
+          
+          {/* Catch-all route */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
