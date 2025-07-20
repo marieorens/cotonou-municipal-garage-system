@@ -59,7 +59,7 @@ export const VehicleLookupPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background animate-fade-in">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">

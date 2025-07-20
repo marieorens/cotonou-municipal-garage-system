@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
@@ -9,6 +9,7 @@ import { Loader2 } from 'lucide-react';
 
 export const AppLayout = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -34,8 +35,17 @@ export const AppLayout = () => {
           <AppHeader />
           
           <main className="flex-1 p-6 overflow-auto">
-            <div className="max-w-7xl mx-auto animate-fade-in transition-all duration-300 ease-out">
-              <Outlet />
+            <div className="max-w-7xl mx-auto">
+              <div 
+                key={location.pathname} 
+                className="animate-fade-in"
+                style={{
+                  animationDuration: '0.6s',
+                  animationFillMode: 'both'
+                }}
+              >
+                <Outlet />
+              </div>
             </div>
           </main>
           
