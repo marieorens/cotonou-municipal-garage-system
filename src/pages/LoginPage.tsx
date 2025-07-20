@@ -62,7 +62,7 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex animate-fade-in">
       <div className="hidden lg:flex lg:w-1/2 bg-primary">
         <div 
           className="w-full bg-cover bg-center relative"
