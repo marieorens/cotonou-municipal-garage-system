@@ -27,14 +27,14 @@ export const AppLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-screen flex w-full bg-background transition-all duration-300 ease-out">
         <AppSidebar />
         
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col transition-all duration-300 ease-out">
           <AppHeader />
           
           <main className="flex-1 p-6 overflow-auto">
-            <div className="max-w-7xl mx-auto animate-fade-in">
+            <div className="max-w-7xl mx-auto animate-fade-in transition-all duration-300 ease-out">
               <Outlet />
             </div>
           </main>
