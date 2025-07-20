@@ -1,5 +1,4 @@
-import React from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, LoginCredentials, AuthResponse } from '@/types';
 import { setToken, removeToken, getToken } from '@/services/api';
 import { MockApiService } from '@/services/mockApi';
