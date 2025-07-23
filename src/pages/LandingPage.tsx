@@ -74,8 +74,8 @@ export const LandingPage = () => {
                   🇧🇯 Mairie de Cotonou - Innovation Numérique
                 </Badge>
                 <h1 className="text-4xl lg:text-6xl font-bold text-foreground leading-tight">
-                  Système de Gestion de la
-                  <span className="bg-municipal-gradient bg-clip-text text-transparent"> Fourrière Municipale</span>
+                  Système de Gestion Informatisée Des
+                  <span className="bg-municipal-gradient bg-clip-text text-transparent"> Fourrières Municipales</span>
                 </h1>
                 <p className="text-xl text-muted-foreground leading-relaxed">
                   Solution digitale complète pour la gestion moderne et efficace des véhicules en fourrière. 
@@ -83,14 +83,7 @@ export const LandingPage = () => {
                 </p>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="municipal" asChild>
-                  <Link to="/vehicule-lookup">
-                    <Car className="mr-2 h-5 w-5" />
-                    Consulter mon véhicule
-                  </Link>
-                </Button>
-              </div>
+             
 
               {/* Quick Stats */}
               <div className="grid grid-cols-2 gap-4 pt-8 border-t border-border">
@@ -171,7 +164,7 @@ export const LandingPage = () => {
               <Button size="lg" variant="municipal" asChild>
                 <Link to="/vehicule-lookup">
                   <Search className="mr-2 h-5 w-5" />
-                  Rechercher mon véhicule
+                  Retirer mon véhicule
                 </Link>
               </Button>
             </div>
@@ -197,9 +190,12 @@ export const LandingPage = () => {
               <p className="text-sm text-muted-foreground">
                 © 2024 Mairie de Cotonou. Tous droits réservés.
               </p>
+             
               <p className="text-xs text-muted-foreground mt-1">
-                Développé avec ❤️ pour la ville de Cotonou
+                Système développé par <a href="https://www.linkedin.com/in/marie-orens-tonon-277b22260/" >Orens TONON</a>
               </p>
+            
+
             </div>
           </div>
         </div>

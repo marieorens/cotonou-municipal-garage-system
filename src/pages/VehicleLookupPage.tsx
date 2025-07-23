@@ -69,10 +69,6 @@ export const VehicleLookupPage = () => {
               Retour à l'accueil
             </Link>
           </Button>
-          <div className="flex items-center gap-2">
-            <Car className="h-5 w-5 text-primary" />
-            <span className="font-semibold">Consulter votre véhicule</span>
-          </div>
         </div>
       </header>
 
