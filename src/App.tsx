@@ -16,6 +16,7 @@ import { VehicleDetailPage } from "@/pages/VehicleDetailPage";
 import { OwnersPage } from "@/pages/OwnersPage";
 import { ProceduresPage } from "@/pages/ProceduresPage";
 import { ProcedureFormPage } from "@/pages/ProcedureFormPage";
+import { ProcedureDetailPage } from "@/pages/ProcedureDetailPage";
 import { PaymentsPage } from "@/pages/PaymentsPage";
 import { NotificationsPage } from "@/pages/NotificationsPage";
 import { UsersPage } from "@/pages/UsersPage";
@@ -69,7 +70,7 @@ const App = () => (
             <Route path="vehicules/:id" element={<VehicleDetailPage />} />
             <Route path="proprietaires" element={<OwnersPage />} />
             <Route path="procedures" element={
-              <ProtectedRoute roles={['admin', 'agent']}>
+              <ProtectedRoute roles={['admin', 'agent', 'finance']}>
                 <ProceduresPage />
               </ProtectedRoute>
             } />
@@ -81,6 +82,11 @@ const App = () => (
             <Route path="procedures/:procedureId/edit" element={
               <ProtectedRoute roles={['admin', 'agent']}>
                 <ProcedureFormPage />
+              </ProtectedRoute>
+            } />
+            <Route path="procedures/:procedureId" element={
+              <ProtectedRoute roles={['admin', 'agent', 'finance']}>
+                <ProcedureDetailPage />
               </ProtectedRoute>
             } />
             <Route path="paiements" element={

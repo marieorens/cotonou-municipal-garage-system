@@ -15,7 +15,6 @@ export const ProceduresPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProcedure, setSelectedProcedure] = useState<string | null>(null);
   const [procedures, setProcedures] = useState<Procedure[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -181,7 +180,7 @@ export const ProceduresPage = () => {
             ) : (
               filteredProcedures.map((procedure) => (
                 <Card key={procedure.id} className="cursor-pointer hover:shadow-md transition-shadow"
-                      onClick={() => setSelectedProcedure(procedure.id)}>
+                      onClick={() => navigate(`/app/procedures/${procedure.id}`)}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
