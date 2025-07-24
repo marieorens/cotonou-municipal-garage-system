@@ -145,15 +145,63 @@ export const VehicleLookupPage = () => {
                     </div>
                   </div>
                   
-                  <div className="pt-4 border-t border-border">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Pour récupérer votre véhicule, présentez-vous à la fourrière municipale avec les documents suivants :
-                    </p>
-                    <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                      <li>Carte grise du véhicule</li>
-                      <li>Pièce d'identité du propriétaire</li>
-                      <li>Justificatif de paiement des frais</li>
-                    </ul>
+                  {/* Payment Information Section */}
+                  <div className="pt-4 border-t border-border space-y-4">
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-blue-900 mb-2">💳 Paiement des frais</h4>
+                      <p className="text-sm text-blue-800 mb-3">
+                        <strong>Les paiements se font exclusivement via le Trésor Public du Bénin</strong>
+                      </p>
+                      <div className="space-y-2 text-sm text-blue-700">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          <div>
+                            <span className="font-medium">Compte bancaire:</span>
+                            <p className="font-mono bg-white/50 px-2 py-1 rounded">00123-45678-90</p>
+                            <p className="text-xs">Banque du Trésor Public</p>
+                          </div>
+                          <div>
+                            <span className="font-medium">Paiement en ligne:</span>
+                            <p>
+                              <a 
+                                href="https://tresor.gouv.bj" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-blue-600 underline hover:text-blue-800"
+                              >
+                                tresor.gouv.bj →
+                              </a>
+                            </p>
+                            <p className="text-xs">Site officiel du Trésor</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 p-2 bg-white/50 rounded">
+                          <span className="font-medium">Référence obligatoire:</span>
+                          <p className="font-mono font-bold">FOURR-{searchResult.plateNumber}</p>
+                          <p className="text-xs text-blue-600">⚠️ Mentionnez cette référence lors du paiement</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-green-900 mb-2">📋 Documents requis pour la récupération</h4>
+                      <ul className="text-sm text-green-700 space-y-1 list-disc list-inside">
+                        <li>Carte grise du véhicule</li>
+                        <li>Pièce d'identité du propriétaire</li>
+                        <li><strong>Justificatif de paiement du Trésor Public</strong></li>
+                        <li>Procuration si récupération par un tiers</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-orange-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-orange-900 mb-2">📍 Adresse de la fourrière</h4>
+                      <div className="text-sm text-orange-700 space-y-1">
+                        <p><strong>Fourrière Municipale de Cotonou</strong></p>
+                        <p>Avenue Steinmetz, près du Marché Dantokpa</p>
+                        <p>📞 Tél: +229 21 30 04 00</p>
+                        <p>📧 Email: fourriere@mairie-cotonou.bj</p>
+                        <p>🕐 Ouvert: Lun-Ven 8h-17h, Sam 8h-12h</p>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
