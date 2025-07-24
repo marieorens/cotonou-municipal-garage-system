@@ -255,41 +255,56 @@ export class MockApiService {
     };
   }
 
+  // Mock procedures database
+  static mockProcedures: Procedure[] = [
+    {
+      id: '1',
+      vehicle_id: '1',
+      type: 'release',
+      status: 'pending',
+      documents: [
+        {
+          id: '1',
+          name: 'Carte grise',
+          type: 'pdf',
+          url: '/documents/carte_grise_1.pdf',
+          uploaded_at: new Date().toISOString()
+        }
+      ],
+      fees_calculated: 45000,
+      created_by: '1',
+      created_at: '2024-01-15T10:30:00Z',
+      updated_at: '2024-01-15T10:30:00Z',
+    },
+    {
+      id: '2',
+      vehicle_id: '2',
+      type: 'sale',
+      status: 'in_progress',
+      documents: [],
+      fees_calculated: 125000,
+      created_by: '1',
+      created_at: '2024-01-14T14:20:00Z',
+      updated_at: '2024-01-14T14:20:00Z',
+    }
+  ];
+
   // Procedures with mock data
   static async getProcedures(): Promise<Procedure[]> {
     await delay(500);
-    return [
-      {
-        id: '1',
-        vehicle_id: '1',
-        type: 'release',
-        status: 'pending',
-        documents: [
-          {
-            id: '1',
-            name: 'Carte grise',
-            type: 'pdf',
-            url: '/documents/carte_grise_1.pdf',
-            uploaded_at: new Date().toISOString()
-          }
-        ],
-        fees_calculated: 45000,
-        created_by: '1',
-        created_at: '2024-01-15T10:30:00Z',
-        updated_at: '2024-01-15T10:30:00Z',
-      },
-      {
-        id: '2',
-        vehicle_id: '2',
-        type: 'sale',
-        status: 'in_progress',
-        documents: [],
-        fees_calculated: 125000,
-        created_by: '1',
-        created_at: '2024-01-14T14:20:00Z',
-        updated_at: '2024-01-14T14:20:00Z',
-      }
-    ];
+    return this.mockProcedures;
+  }
+
+  static async createProcedure(procedureData: Omit<Procedure, 'id' | 'created_at' | 'updated_at'>): Promise<{ procedure: Procedure }> {
+    await delay(600);
+    const newProcedure: Procedure = {
+      id: (this.mockProcedures.length + 1).toString(),
+      ...procedureData,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    this.mockProcedures.push(newProcedure);
+    return { procedure: newProcedure };
   }
 
   // Payments with mock data

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, FileText, Upload, CheckCircle, Clock, AlertCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export const ProceduresPage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProcedure, setSelectedProcedure] = useState<string | null>(null);
   const [procedures, setProcedures] = useState<Procedure[]>([]);
@@ -154,10 +156,7 @@ export const ProceduresPage = () => {
           </div>
           {(user?.role === 'admin' || user?.role === 'agent') && (
             <Button
-              onClick={() => {
-                console.log('Créer nouvelle procédure');
-                // Redirect to form or open modal
-              }}
+              onClick={() => navigate('/app/procedures/new')}
             >
               <Plus className="w-4 h-4 mr-2" />
               Nouvelle procédure

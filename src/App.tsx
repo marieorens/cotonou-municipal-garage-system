@@ -15,6 +15,7 @@ import { VehicleFormPage } from "@/pages/VehicleFormPage";
 import { VehicleDetailPage } from "@/pages/VehicleDetailPage";
 import { OwnersPage } from "@/pages/OwnersPage";
 import { ProceduresPage } from "@/pages/ProceduresPage";
+import { ProcedureFormPage } from "@/pages/ProcedureFormPage";
 import { PaymentsPage } from "@/pages/PaymentsPage";
 import { NotificationsPage } from "@/pages/NotificationsPage";
 import { UsersPage } from "@/pages/UsersPage";
@@ -70,6 +71,16 @@ const App = () => (
             <Route path="procedures" element={
               <ProtectedRoute roles={['admin', 'agent']}>
                 <ProceduresPage />
+              </ProtectedRoute>
+            } />
+            <Route path="procedures/new" element={
+              <ProtectedRoute roles={['admin', 'agent']}>
+                <ProcedureFormPage />
+              </ProtectedRoute>
+            } />
+            <Route path="procedures/:procedureId/edit" element={
+              <ProtectedRoute roles={['admin', 'agent']}>
+                <ProcedureFormPage />
               </ProtectedRoute>
             } />
             <Route path="paiements" element={
