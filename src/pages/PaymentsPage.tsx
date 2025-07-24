@@ -41,8 +41,8 @@ export const PaymentsPage = () => {
           MockApiService.getVehicles(),
           MockApiService.getPayments()
         ]);
-        setVehicles(vehiclesData.vehicles);
-        setPayments(paymentsData);
+        setVehicles(vehiclesData.vehicles || []);
+        setPayments(paymentsData || []);
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
       } finally {
