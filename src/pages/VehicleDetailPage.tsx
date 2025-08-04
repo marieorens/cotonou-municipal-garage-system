@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Edit, QrCode, MapPin, Calendar, DollarSign, User, FileText, Download } from 'lucide-react';
+import { ArrowLeft, Edit, MapPin, Calendar, DollarSign, User, FileText, Download, MessageCircle, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -190,10 +190,6 @@ export const VehicleDetailPage = () => {
               </Link>
             </Button>
           )}
-          <Button variant="outline">
-            <QrCode className="h-4 w-4 mr-2" />
-            QR Code
-          </Button>
         </div>
       </div>
 
@@ -213,9 +209,8 @@ export const VehicleDetailPage = () => {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           <Tabs defaultValue="details" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="details">Détails</TabsTrigger>
-              <TabsTrigger value="photos">Photos</TabsTrigger>
               <TabsTrigger value="timeline">Chronologie</TabsTrigger>
             </TabsList>
             
@@ -264,40 +259,6 @@ export const VehicleDetailPage = () => {
               </Card>
             </TabsContent>
             
-            <TabsContent value="photos" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Photos du véhicule</CardTitle>
-                  <CardDescription>
-                    {vehicle.photos.length} photo(s) disponible(s)
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {vehicle.photos.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {vehicle.photos.map((photo, index) => (
-                        <div key={index} className="group relative">
-                          <img
-                            src={photo}
-                            alt={`Photo ${index + 1}`}
-                            className="w-full h-48 object-cover rounded-lg border cursor-pointer hover:opacity-90 transition-opacity"
-                          />
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                            <Button variant="secondary" size="sm">
-                              Voir en grand
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground text-center py-8">
-                      Aucune photo disponible
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
             
             <TabsContent value="timeline" className="space-y-4">
               <Card>
@@ -383,10 +344,29 @@ export const VehicleDetailPage = () => {
                 </div>
                 
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => {
+                      if (owner.phone) {
+                        window.open(`tel:${owner.phone}`, '_self');
+                      }
+                    }}
+                  >
+                    <MessageCircle className="h-3 w-3 mr-1" />
                     Contacter
                   </Button>
-                  <Button size="sm" variant="outline" className="flex-1">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => {
+                      // Navigation vers l'historique du propriétaire
+                      console.log('Afficher historique du propriétaire:', owner.id);
+                    }}
+                  >
+                    <History className="h-3 w-3 mr-1" />
                     Historique
                   </Button>
                 </div>
@@ -403,15 +383,38 @@ export const VehicleDetailPage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button size="sm" variant="outline" className="w-full justify-start">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => {
+                  // Générer et télécharger le PV
+                  console.log('Générer PV pour véhicule:', vehicle.id);
+                }}
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Générer PV
               </Button>
-              <Button size="sm" variant="outline" className="w-full justify-start">
-                <FileText className="h-4 w-4 mr-2" />
-                Nouvelle procédure
-              </Button>
-              <Button size="sm" variant="outline" className="w-full justify-start">
+              {hasAnyRole(['admin', 'agent']) && (
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => navigate(`/app/procedures/new?vehicle_id=${vehicle.id}`)}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Nouvelle procédure
+                </Button>
+              )}
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => {
+                  // Calculer et afficher les frais
+                  console.log('Calculer frais pour véhicule:', vehicle.id);
+                }}
+              >
                 <DollarSign className="h-4 w-4 mr-2" />
                 Calculer frais
               </Button>

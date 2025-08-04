@@ -195,12 +195,6 @@ export const ProceduresPage = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span>Progression</span>
-                        <span>{getProgressValue(procedure.status)}%</span>
-                      </div>
-                      <Progress value={getProgressValue(procedure.status)} className="w-full" />
-                      
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                         <div>
                           <span className="text-sm text-muted-foreground">Frais calculés:</span>
@@ -233,7 +227,16 @@ export const ProceduresPage = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <Progress value={60} className="w-full" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm text-muted-foreground">Frais calculés:</span>
+                      <p className="font-medium">{formatCurrency(procedure.fees_calculated)}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-muted-foreground">Documents:</span>
+                      <p className="font-medium">{procedure.documents.length} document(s)</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}

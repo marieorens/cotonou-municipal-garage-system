@@ -20,7 +20,7 @@ interface VehicleFormData {
   estimated_value: number;
   location: string;
   description?: string;
-  photos: File[];
+  owner_name?: string;
 }
 
 const initialFormData: VehicleFormData = {
@@ -33,7 +33,7 @@ const initialFormData: VehicleFormData = {
   estimated_value: 0,
   location: '',
   description: '',
-  photos: [],
+  owner_name: '',
 };
 
 export const VehicleFormPage = () => {
@@ -43,7 +43,6 @@ export const VehicleFormPage = () => {
   
   const [formData, setFormData] = useState<VehicleFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [photosPreviews, setPhotosPreviews] = useState<string[]>([]);
 
   const handleInputChange = (field: keyof VehicleFormData, value: any) => {
     setFormData(prev => ({
@@ -52,40 +51,6 @@ export const VehicleFormPage = () => {
     }));
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length + formData.photos.length > 10) {
-      toast({
-        title: 'Limite atteinte',
-        description: 'Vous ne pouvez télécharger que 10 photos maximum.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Add new photos
-    setFormData(prev => ({
-      ...prev,
-      photos: [...prev.photos, ...files],
-    }));
-
-    // Create previews
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPhotosPreviews(prev => [...prev, e.target?.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const removePhoto = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      photos: prev.photos.filter((_, i) => i !== index),
-    }));
-    setPhotosPreviews(prev => prev.filter((_, i) => i !== index));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -249,6 +214,16 @@ export const VehicleFormPage = () => {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="owner_name">Nom du propriétaire (optionnel)</Label>
+              <Input
+                id="owner_name"
+                placeholder="Nom du propriétaire si connu"
+                value={formData.owner_name}
+                onChange={(e) => handleInputChange('owner_name', e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="description">Description (optionnel)</Label>
               <Textarea
                 id="description"
@@ -261,60 +236,6 @@ export const VehicleFormPage = () => {
           </CardContent>
         </Card>
 
-        {/* Photos */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Camera className="h-5 w-5" />
-              Photos du véhicule
-            </CardTitle>
-            <CardDescription>
-              Télécharger jusqu'à 10 photos du véhicule (recommandé: vues avant, arrière, latérales, et dommages)
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
-              <input
-                type="file"
-                id="photos"
-                multiple
-                accept="image/*"
-                onChange={handlePhotoUpload}
-                className="hidden"
-              />
-              <label htmlFor="photos" className="cursor-pointer">
-                <div className="flex flex-col items-center gap-2">
-                  <Upload className="h-12 w-12 text-muted-foreground" />
-                  <p className="text-sm font-medium">Cliquer pour télécharger des photos</p>
-                  <p className="text-xs text-muted-foreground">
-                    PNG, JPG, GIF jusqu'à 5MB par fichier
-                  </p>
-                </div>
-              </label>
-            </div>
-
-            {photosPreviews.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {photosPreviews.map((preview, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={preview}
-                      alt={`Photo ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg border"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removePhoto(index)}
-                      className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-4">

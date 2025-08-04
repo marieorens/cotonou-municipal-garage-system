@@ -40,16 +40,10 @@ const navigationItems = [
     roles: ['admin', 'agent', 'finance'],
   },
   {
-    title: 'Propriétaires',
-    url: '/app/proprietaires',
-    icon: Users,
-    roles: ['admin', 'agent', 'finance'],
-  },
-  {
     title: 'Procédures',
     url: '/app/procedures',
     icon: FileText,
-    roles: ['admin', 'agent'],
+    roles: ['admin', 'agent', 'finance'],
   },
   {
     title: 'Paiements',

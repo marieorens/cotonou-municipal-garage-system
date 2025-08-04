@@ -233,9 +233,13 @@ export const UsersPage = () => {
                   </div>
                   <Button 
                     className="w-full"
-                    onClick={() => {
+                    onClick={async () => {
+                      // Create user logic
                       console.log('Créer utilisateur');
+                      // Simulate API call
+                      await new Promise(resolve => setTimeout(resolve, 1000));
                       setIsDialogOpen(false);
+                      console.log('Utilisateur créé avec succès');
                     }}
                   >
                     Créer l'utilisateur
@@ -278,7 +282,10 @@ export const UsersPage = () => {
                           <Button 
                             size="sm" 
                             variant="outline"
-                            onClick={() => console.log('Modifier utilisateur', user.id)}
+                            onClick={() => {
+                              // Edit user logic
+                              console.log('Modifier utilisateur', user.id);
+                            }}
                             title="Modifier"
                           >
                             <Edit className="w-3 h-3" />
@@ -287,7 +294,10 @@ export const UsersPage = () => {
                             <Button 
                               size="sm" 
                               variant="outline"
-                              onClick={() => console.log('Désactiver utilisateur', user.id)}
+                              onClick={() => {
+                                // Deactivate user logic
+                                console.log('Désactiver utilisateur', user.id);
+                              }}
                               title="Désactiver"
                             >
                               <UserX className="w-3 h-3" />
@@ -296,7 +306,10 @@ export const UsersPage = () => {
                             <Button 
                               size="sm" 
                               variant="outline"
-                              onClick={() => console.log('Activer utilisateur', user.id)}
+                              onClick={() => {
+                                // Activate user logic
+                                console.log('Activer utilisateur', user.id);
+                              }}
                               title="Activer"
                             >
                               <UserCheck className="w-3 h-3" />
@@ -305,7 +318,12 @@ export const UsersPage = () => {
                           <Button 
                             size="sm" 
                             variant="destructive"
-                            onClick={() => console.log('Supprimer utilisateur', user.id)}
+                            onClick={() => {
+                              // Delete user logic
+                              if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
+                                console.log('Supprimer utilisateur', user.id);
+                              }
+                            }}
                             title="Supprimer"
                           >
                             <Trash2 className="w-3 h-3" />
@@ -335,7 +353,14 @@ export const UsersPage = () => {
                       </CardTitle>
                       <CardDescription>{role.description}</CardDescription>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        // Edit role logic
+                        console.log('Modifier rôle', role.id);
+                      }}
+                    >
                       <Edit className="w-3 h-3 mr-1" />
                       Modifier
                     </Button>

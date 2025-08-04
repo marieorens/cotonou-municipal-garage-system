@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Save, FileText, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Save, FileText, AlertCircle, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { MockApiService } from '@/services/mockApi';
 import { Vehicle, Procedure, ProcedureType } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,6 +30,8 @@ export const ProcedureFormPage = () => {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingVehicles, setLoadingVehicles] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [vehicleSearch, setVehicleSearch] = useState('');
   
   const isEdit = !!procedureId;
   
@@ -178,22 +182,65 @@ export const ProcedureFormPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="vehicle_id">Véhicule concerné *</Label>
-                <Select 
-                  value={watchedVehicleId || ''} 
-                  onValueChange={(value) => setValue('vehicle_id', value)}
-                  disabled={loadingVehicles}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={loadingVehicles ? "Chargement..." : "Sélectionner un véhicule"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {vehicles.map((vehicle) => (
-                      <SelectItem key={vehicle.id} value={vehicle.id}>
-                        {vehicle.license_plate} - {vehicle.make} {vehicle.model} ({vehicle.color})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="w-full justify-between"
+                      disabled={loadingVehicles}
+                    >
+                      {watchedVehicleId ? (
+                        vehicles.find(vehicle => vehicle.id === watchedVehicleId)?.license_plate + 
+                        ' - ' + 
+                        vehicles.find(vehicle => vehicle.id === watchedVehicleId)?.make + 
+                        ' ' + 
+                        vehicles.find(vehicle => vehicle.id === watchedVehicleId)?.model
+                      ) : (
+                        loadingVehicles ? "Chargement..." : "Rechercher un véhicule..."
+                      )}
+                      <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput 
+                        placeholder="Rechercher par plaque d'immatriculation..." 
+                        value={vehicleSearch}
+                        onValueChange={setVehicleSearch}
+                      />
+                      <CommandList>
+                        <CommandEmpty>Aucun véhicule trouvé.</CommandEmpty>
+                        <CommandGroup>
+                          {vehicles
+                            .filter(vehicle => 
+                              vehicle.license_plate.toLowerCase().includes(vehicleSearch.toLowerCase()) ||
+                              (vehicle.make + ' ' + vehicle.model).toLowerCase().includes(vehicleSearch.toLowerCase())
+                            )
+                            .map((vehicle) => (
+                              <CommandItem
+                                key={vehicle.id}
+                                value={vehicle.id}
+                                onSelect={() => {
+                                  setValue('vehicle_id', vehicle.id);
+                                  setOpen(false);
+                                  setVehicleSearch('');
+                                }}
+                              >
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{vehicle.license_plate}</span>
+                                  <span className="text-sm text-muted-foreground">
+                                    {vehicle.make} {vehicle.model} ({vehicle.color})
+                                  </span>
+                                </div>
+                              </CommandItem>
+                            ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 {errors.vehicle_id && (
                   <p className="text-sm text-destructive">Ce champ est requis</p>
                 )}

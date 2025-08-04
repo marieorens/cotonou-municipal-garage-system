@@ -38,9 +38,28 @@ export const SettingsPage = () => {
     }
   });
 
-  const handleSave = () => {
-    // Here you would save to API
-    console.log('Saving settings:', settings);
+  const handleSave = async () => {
+    try {
+      // Save settings to API
+      console.log('Saving settings:', settings);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Show success message
+      console.log('Settings saved successfully');
+    } catch (error) {
+      console.error('Error saving settings:', error);
+    }
+  };
+
+  const handleTemplateChange = (templateType: 'receiptTemplate' | 'pvTemplate' | 'noticeTemplate', value: string) => {
+    setSettings(prev => ({
+      ...prev,
+      documents: {
+        ...prev.documents,
+        [templateType]: value
+      }
+    }));
   };
 
   return (
@@ -313,10 +332,7 @@ export const SettingsPage = () => {
                   id="receiptTemplate"
                   rows={4}
                   value={settings.documents.receiptTemplate}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    documents: { ...settings.documents, receiptTemplate: e.target.value }
-                  })}
+                  onChange={(e) => handleTemplateChange('receiptTemplate', e.target.value)}
                 />
               </div>
               
@@ -326,10 +342,7 @@ export const SettingsPage = () => {
                   id="pvTemplate"
                   rows={4}
                   value={settings.documents.pvTemplate}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    documents: { ...settings.documents, pvTemplate: e.target.value }
-                  })}
+                  onChange={(e) => handleTemplateChange('pvTemplate', e.target.value)}
                 />
               </div>
               
@@ -339,10 +352,7 @@ export const SettingsPage = () => {
                   id="noticeTemplate"
                   rows={4}
                   value={settings.documents.noticeTemplate}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    documents: { ...settings.documents, noticeTemplate: e.target.value }
-                  })}
+                  onChange={(e) => handleTemplateChange('noticeTemplate', e.target.value)}
                 />
               </div>
             </CardContent>
