@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Save, FileText, AlertCircle, Search } from 'lucide-react';
+import { ArrowLeft, Save, FileText, AlertCircle, Search, Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,6 +20,7 @@ interface ProcedureFormData {
   vehicle_id: string;
   type: ProcedureType;
   description?: string;
+  documents: File[];
 }
 
 export const ProcedureFormPage = () => {
@@ -32,6 +33,7 @@ export const ProcedureFormPage = () => {
   const [loadingVehicles, setLoadingVehicles] = useState(true);
   const [open, setOpen] = useState(false);
   const [vehicleSearch, setVehicleSearch] = useState('');
+  const [documents, setDocuments] = useState<File[]>([]);
   
   const isEdit = !!procedureId;
   
@@ -90,6 +92,19 @@ export const ProcedureFormPage = () => {
     return baseFees[type] + storageFees;
   };
 
+  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length + documents.length > 5) {
+      toast.error('Vous ne pouvez télécharger que 5 documents maximum');
+      return;
+    }
+    setDocuments(prev => [...prev, ...files]);
+  };
+
+  const removeDocument = (index: number) => {
+    setDocuments(prev => prev.filter((_, i) => i !== index));
+  };
+
   const onSubmit = async (data: ProcedureFormData) => {
     if (!user) {
       toast.error('Utilisateur non authentifié');
@@ -101,13 +116,23 @@ export const ProcedureFormPage = () => {
       
       const estimatedFees = calculateEstimatedFees(data.type, selectedVehicle);
       
+      // Create documents array with file info (in real app, would upload files first)
+      const documentData = documents.map((file, index) => ({
+        id: `doc_${Date.now()}_${index}`,
+        name: file.name,
+        type: file.type,
+        url: `placeholder_url_${file.name}`,
+        uploaded_at: new Date().toISOString()
+      }));
+      
       const procedureData = {
         vehicle_id: data.vehicle_id,
         type: data.type,
         status: 'pending' as const,
         fees_calculated: estimatedFees,
         created_by: user.id,
-        documents: []
+        documents: documentData,
+        description: data.description || undefined
       };
 
       if (isEdit) {
@@ -286,6 +311,67 @@ export const ProcedureFormPage = () => {
                 rows={3}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Documents Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Upload className="w-5 h-5" />
+              Documents justificatifs
+            </CardTitle>
+            <CardDescription>
+              Télécharger les documents nécessaires à la procédure (maximum 5 fichiers)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+              <input
+                type="file"
+                id="documents"
+                multiple
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                onChange={handleDocumentUpload}
+                className="hidden"
+              />
+              <label htmlFor="documents" className="cursor-pointer">
+                <div className="flex flex-col items-center gap-2">
+                  <Upload className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm font-medium">Cliquer pour télécharger des documents</p>
+                  <p className="text-xs text-muted-foreground">
+                    PDF, DOC, DOCX, JPG, PNG jusqu'à 10MB par fichier
+                  </p>
+                </div>
+              </label>
+            </div>
+
+            {documents.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Documents ajoutés :</p>
+                {documents.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">{file.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {(file.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeDocument(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
