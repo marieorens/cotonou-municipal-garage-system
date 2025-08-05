@@ -156,28 +156,27 @@ export const VehicleLookupPage = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           <div>
                             <span className="font-medium">Compte bancaire:</span>
-                            <p className="font-mono bg-white/50 px-2 py-1 rounded">00123-45678-90</p>
-                            <p className="text-xs">Banque du Trésor Public</p>
+                            <p className="font-mono bg-white/50 px-2 py-1 rounded">BJ6600100100000010179081</p>
+                      
                           </div>
                           <div>
                             <span className="font-medium">Paiement en ligne:</span>
                             <p>
                               <a 
-                                href="https://tresor.gouv.bj" 
+                                href="https://tresorbenin.bj" 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="text-blue-600 underline hover:text-blue-800"
                               >
-                                tresor.gouv.bj →
+                                tresorbenin.bj →
                               </a>
                             </p>
-                            <p className="text-xs">Site officiel du Trésor</p>
+                           
                           </div>
                         </div>
                         <div className="mt-3 p-2 bg-white/50 rounded">
-                          <span className="font-medium">Référence obligatoire:</span>
-                          <p className="font-mono font-bold">FOURR-{searchResult.plateNumber}</p>
-                          <p className="text-xs text-blue-600">⚠️ Mentionnez cette référence lors du paiement</p>
+                          <span className="font-medium">Le compte est intitulé:</span>
+                          <p className="font-mono font-bold">MISP/FRAIS FOURRIERE</p>
                         </div>
                       </div>
                     </div>
@@ -185,7 +184,7 @@ export const VehicleLookupPage = () => {
                     <div className="bg-green-50 p-4 rounded-lg">
                       <h4 className="font-semibold text-green-900 mb-2">📋 Documents requis pour la récupération</h4>
                       <ul className="text-sm text-green-700 space-y-1 list-disc list-inside">
-                        <li>Carte grise du véhicule</li>
+                        
                         <li>Pièce d'identité du propriétaire</li>
                         <li><strong>Justificatif de paiement du Trésor Public</strong></li>
                         <li>Procuration si récupération par un tiers</li>
@@ -196,7 +195,7 @@ export const VehicleLookupPage = () => {
                       <h4 className="font-semibold text-orange-900 mb-2">📍 Adresse de la fourrière</h4>
                       <div className="text-sm text-orange-700 space-y-1">
                         <p><strong>Fourrière Municipale de Cotonou</strong></p>
-                        <p>Avenue Steinmetz, près du Marché Dantokpa</p>
+    
                         <p>📞 Tél: +229 21 30 04 00</p>
                         <p>📧 Email: fourriere@mairie-cotonou.bj</p>
                         <p>🕐 Ouvert: Lun-Ven 8h-17h, Sam 8h-12h</p>
@@ -219,8 +218,8 @@ export const VehicleLookupPage = () => {
                   </p>
                   <div className="space-y-2">
                     <p className="text-sm font-semibold">Fourrière Municipale de Cotonou</p>
-                    <p className="text-sm text-muted-foreground">Tél: +229 21 30 04 00</p>
-                    <p className="text-sm text-muted-foreground">Email: fourriere@mairie-cotonou.bj</p>
+                    <p className="text-sm text-muted-foreground">📞Tél: +229 21 30 04 00</p>
+                    <p className="text-sm text-muted-foreground">📧Email: fourriere@mairie-cotonou.bj</p>
                   </div>
                 </CardContent>
               </Card>

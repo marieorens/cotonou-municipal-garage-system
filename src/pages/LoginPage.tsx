@@ -151,14 +151,15 @@ export const LoginPage = () => {
                 </Button>
               </form>
 
-              <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+             {/* <div className="mt-6 p-4 bg-muted/50 rounded-lg">
                 <h3 className="font-medium text-sm mb-2">Comptes de démonstration :</h3>
                 <div className="space-y-2 text-xs">
                   <div><strong>Admin:</strong> admin@cotonou.bj / admin123</div>
                   <div><strong>Agent:</strong> agent@cotonou.bj / agent123</div>
                   <div><strong>Finance:</strong> finance@cotonou.bj / finance123</div>
                 </div>
-              </div>
+              </div> */}
+              
             </CardContent>
           </Card>
         </div>

@@ -32,12 +32,7 @@ const features = [
   },
 ];
 
-const stats = [
-  { label: 'Véhicules traités', value: '2,547' },
-  { label: 'Taux de récupération', value: '87%' },
-  { label: 'Revenus générés', value: '125M FCFA' },
-  { label: 'Délai moyen', value: '3,2 jours' },
-];
+
 
 export const LandingPage = () => {
   return (
@@ -46,9 +41,6 @@ export const LandingPage = () => {
       <nav className="border-b border-border bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-municipal-gradient rounded-lg flex items-center justify-center">
-              <Building2 className="h-5 w-5 text-white" />
-            </div>
             <div>
               <h2 className="font-semibold text-foreground">Fourrière Municipale</h2>
               <p className="text-xs text-muted-foreground">Mairie de Cotonou</p>
@@ -70,16 +62,12 @@ export const LandingPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="space-y-4">
-                <Badge variant="outline" className="w-fit">
-                  🇧🇯 Mairie de Cotonou - Innovation Numérique
-                </Badge>
                 <h1 className="text-4xl lg:text-6xl font-bold text-foreground leading-tight">
                   Système de Gestion Informatisée Des
                   <span className="bg-municipal-gradient bg-clip-text text-transparent"> Fourrières Municipales</span>
                 </h1>
                 <p className="text-xl text-muted-foreground leading-relaxed">
-                  Solution digitale complète pour la gestion moderne et efficace des véhicules en fourrière. 
-                  Streamlinez vos opérations, améliorez la transparence et optimisez les revenus municipaux.
+                  Solution digitale complète pour la gestion moderne et efficace des véhicules gardés dans les fourrières municipales de la ville de Cotonou. 
                 </p>
               </div>
               
@@ -87,12 +75,7 @@ export const LandingPage = () => {
 
               {/* Quick Stats */}
               <div className="grid grid-cols-2 gap-4 pt-8 border-t border-border">
-                {stats.map((stat, index) => (
-                  <div key={index} className="text-center">
-                    <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
-                  </div>
-                ))}
+                
               </div>
             </div>
             
@@ -106,7 +89,6 @@ export const LandingPage = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                 <div className="absolute bottom-6 left-6 text-white">
                   <h3 className="text-lg font-semibold">Mairie de Cotonou</h3>
-                  <p className="text-sm opacity-90">Innovation au service des citoyens</p>
                 </div>
               </div>
             </div>
@@ -155,16 +137,13 @@ export const LandingPage = () => {
               <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
                 Votre véhicule est-il en fourrière ?
               </h2>
-              <p className="text-xl text-muted-foreground">
-                Vérifiez rapidement l'état de votre véhicule avec votre numéro d'immatriculation
-              </p>
             </div>
             
             <div className="flex justify-center">
               <Button size="lg" variant="municipal" asChild>
                 <Link to="/vehicule-lookup">
                   <Search className="mr-2 h-5 w-5" />
-                  Retirer mon véhicule
+                  Voir l'état de mon véhicule en fourrière
                 </Link>
               </Button>
             </div>
@@ -177,9 +156,6 @@ export const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-municipal-gradient rounded-lg flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-white" />
-              </div>
               <div>
                 <h3 className="font-semibold text-foreground">Mairie de Cotonou</h3>
                 <p className="text-sm text-muted-foreground">Service de la Fourrière Municipale</p>

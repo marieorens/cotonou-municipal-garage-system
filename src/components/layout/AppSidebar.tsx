@@ -8,7 +8,6 @@ import {
   Settings,
   Shield,
   Bell,
-  Building2,
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,7 +27,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const navigationItems = [
   {
-    title: 'Dashboard',
+    title: 'Tableau de bord',
     url: '/app/dashboard',
     icon: BarChart3,
     roles: ['admin', 'agent', 'finance'],
@@ -102,9 +101,6 @@ export const AppSidebar = () => {
     <Sidebar className="border-r border-border transition-all duration-300 ease-out">
       <SidebarHeader className="p-4 border-b border-border">
         <div className="flex items-center gap-3 transition-all duration-300 ease-out hover:scale-[1.02] transform-gpu">
-          <div className="w-8 h-8 bg-municipal-gradient rounded-lg flex items-center justify-center shadow-lg transition-all duration-200 hover:shadow-xl">
-            <Building2 className="h-5 w-5 text-white" />
-          </div>
           {!collapsed && (
             <div className="flex-1 min-w-0 animate-fade-in">
               <h2 className="font-semibold text-sm text-foreground truncate">

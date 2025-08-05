@@ -271,7 +271,6 @@ export const PaymentsPage = () => {
                   <TableHead className="min-w-[120px]">Montant dû</TableHead>
                   <TableHead className="hidden md:table-cell">Frais stockage</TableHead>
                   <TableHead className="min-w-[100px]">Statut</TableHead>
-                  <TableHead className="min-w-[100px]">Urgence</TableHead>
                   <TableHead className="min-w-[60px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -394,9 +393,9 @@ export const PaymentsPage = () => {
                     <strong>Les paiements se font exclusivement via le Trésor Public du Bénin</strong>
                   </p>
                   <div className="space-y-1 text-sm">
-                    <p><strong>Compte bancaire:</strong> 00123-45678-90 (Banque du Trésor)</p>
-                    <p><strong>Site web:</strong> <a href="https://tresor.gouv.bj" className="text-blue-600 underline">tresor.gouv.bj</a></p>
-                    <p><strong>Référence à mentionner:</strong> FOURR-{selectedVehicle.license_plate}</p>
+                    <p><strong>Compte bancaire: BJ6600100100000010179081 </strong> </p>
+                    <p><strong>Site web:</strong> <a href="https://tresorbenin.bj" className="text-blue-600 underline">tresorbenin.bj</a></p>
+                    <p><strong>Le compte est intitulé:</strong>MISP/FRAIS FOURRIERE</p>
                   </div>
                 </div>
               </div>
