@@ -29,15 +29,7 @@ export const AppHeader = () => {
       <div className="h-full px-6 flex items-center justify-between animate-fade-in">
         {/* Left section */}
         <div className="flex items-center gap-4">
-          <SidebarTrigger className="hover:bg-accent hover:text-accent-foreground transition-all duration-200 hover:scale-105 transform-gpu" />
-          
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground transition-all duration-200" />
-            <Input
-              placeholder="Rechercher véhicule, propriétaire..."
-              className="pl-10 w-64 md:w-80 transition-all duration-200 focus:scale-[1.02] transform-gpu hover:shadow-md focus:shadow-lg"
-            />
-          </div>
+          <SidebarTrigger className="hover:bg-accent hover:text-accent-foreground transition-all duration-200 hover:scale-105 transform-gpu" /> 
         </div>
 
         {/* Right section */}
