@@ -14,7 +14,330 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      documents: {
+        Row: {
+          id: string
+          name: string
+          procedure_id: string
+          type: string
+          uploaded_at: string
+          url: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          procedure_id: string
+          type: string
+          uploaded_at?: string
+          url: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          procedure_id?: string
+          type?: string
+          uploaded_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          channel: string
+          id: string
+          message: string
+          recipient: string
+          sent_at: string
+          status: string
+          type: string
+        }
+        Insert: {
+          channel: string
+          id?: string
+          message: string
+          recipient: string
+          sent_at?: string
+          status?: string
+          type: string
+        }
+        Update: {
+          channel?: string
+          id?: string
+          message?: string
+          recipient?: string
+          sent_at?: string
+          status?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      owners: {
+        Row: {
+          address: string
+          created_at: string
+          email: string | null
+          first_name: string
+          id: string
+          id_number: string
+          id_type: string
+          last_name: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          email?: string | null
+          first_name: string
+          id?: string
+          id_number: string
+          id_type: string
+          last_name: string
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          email?: string | null
+          first_name?: string
+          id?: string
+          id_number?: string
+          id_type?: string
+          last_name?: string
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string
+          id: string
+          owner_id: string
+          payment_date: string
+          payment_method: string
+          receipt_url: string | null
+          reference: string
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description: string
+          id?: string
+          owner_id: string
+          payment_date?: string
+          payment_method: string
+          receipt_url?: string | null
+          reference: string
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          id?: string
+          owner_id?: string
+          payment_date?: string
+          payment_method?: string
+          receipt_url?: string | null
+          reference?: string
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      procedures: {
+        Row: {
+          created_at: string
+          created_by: string
+          fees_calculated: number
+          id: string
+          status: string
+          type: string
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          fees_calculated?: number
+          id?: string
+          status?: string
+          type: string
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          fees_calculated?: number
+          id?: string
+          status?: string
+          type?: string
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "procedures_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          name: string
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          color: string
+          created_at: string
+          description: string | null
+          estimated_value: number
+          id: string
+          impound_date: string
+          license_plate: string
+          location: string
+          make: string
+          model: string
+          owner_id: string | null
+          photos: string[] | null
+          qr_code: string | null
+          status: string
+          type: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          description?: string | null
+          estimated_value?: number
+          id?: string
+          impound_date?: string
+          license_plate: string
+          location: string
+          make: string
+          model: string
+          owner_id?: string | null
+          photos?: string[] | null
+          qr_code?: string | null
+          status?: string
+          type: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          estimated_value?: number
+          id?: string
+          impound_date?: string
+          license_plate?: string
+          location?: string
+          make?: string
+          model?: string
+          owner_id?: string | null
+          photos?: string[] | null
+          qr_code?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
