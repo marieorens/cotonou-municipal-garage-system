@@ -8,9 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MockApiService } from '@/services/mockApi';
 import { Notification } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const notificationTemplates = [
   {
@@ -45,8 +45,12 @@ export const NotificationsPage = () => {
     const fetchNotifications = async () => {
       try {
         setLoading(true);
-        const notificationsData = await MockApiService.getNotifications();
-        setNotifications(notificationsData);
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('*')
+          .order('sent_at', { ascending: false });
+        if (error) throw error;
+        setNotifications((data as any) || []);
       } catch (error) {
         console.error('Erreur lors du chargement des notifications:', error);
       } finally {
