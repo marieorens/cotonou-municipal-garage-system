@@ -11,13 +11,11 @@ import cotonouImage from '@/assets/cotonou-municipal-building.jpg';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export const LoginPage = () => {
-  const { login, signup, isAuthenticated, isLoading } = useAuth();
+  const { login, isAuthenticated, isLoading } = useAuth();
   const [credentials, setCredentials] = useState({
     email: '',
     password: ''
   });
-  const [role, setRole] = useState<'admin' | 'agent' | 'finance'>('agent');
-  const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -36,11 +34,7 @@ export const LoginPage = () => {
     setError('');
 
     try {
-      if (isSignUp) {
-        await signup(credentials, role);
-      } else {
-        await login(credentials);
-      }
+      await login(credentials);
     } catch (err: any) {
       setError(err.message || 'Erreur de connexion');
     } finally {
@@ -93,9 +87,9 @@ export const LoginPage = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <LogIn className="h-12 w-12 mx-auto mb-4 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">{isSignUp ? 'Créer un compte' : 'Connexion'}</h1>
+            <h1 className="text-2xl font-bold text-foreground">Connexion</h1>
             <p className="text-muted-foreground mt-2">
-              {isSignUp ? 'Créez votre compte pour accéder à la plateforme' : 'Accédez à votre espace de travail'}
+              Accédez à votre espace de travail
             </p>
           </div>
 
@@ -124,21 +118,6 @@ export const LoginPage = () => {
                     required
                   />
                 </div>
-                {isSignUp && (
-                  <div className="space-y-2">
-                    <Label>Rôle</Label>
-                    <Select value={role} onValueChange={(v) => setRole(v as 'admin' | 'agent' | 'finance')}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionnez un rôle" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="agent">Agent</SelectItem>
-                        <SelectItem value="finance">Finance</SelectItem>
-                        <SelectItem value="admin">Administrateur</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="password">Mot de passe</Label>
@@ -162,26 +141,15 @@ export const LoginPage = () => {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {isSignUp ? 'Création du compte...' : 'Connexion...'}
+                      Connexion...
                     </>
                   ) : (
                     <>
                       <LogIn className="mr-2 h-4 w-4" />
-                      {isSignUp ? 'Créer un compte' : 'Se connecter'}
+                      Se connecter
                     </>
                   )}
                 </Button>
-                <div className="text-center mt-3 text-sm">
-                  {isSignUp ? (
-                    <button type="button" className="text-primary hover:underline" onClick={() => setIsSignUp(false)}>
-                      Déjà un compte ? Se connecter
-                    </button>
-                  ) : (
-                    <button type="button" className="text-primary hover:underline" onClick={() => setIsSignUp(true)}>
-                      Pas de compte ? Créer un compte
-                    </button>
-                  )}
-                </div>
               </form>
 
              {/* <div className="mt-6 p-4 bg-muted/50 rounded-lg">

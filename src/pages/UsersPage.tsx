@@ -1,53 +1,26 @@
-import { useState } from 'react';
-import { Search, Plus, UserCheck, UserX, Edit, Trash2, Shield, Users } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, UserCheck, UserX, Edit, Trash2, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CreateUserModal } from '@/components/CreateUserModal';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
-const mockUsers = [
-  {
-    id: '1',
-    name: 'HOUNSOU Admin',
-    email: 'admin@mairie-cotonou.bj',
-    role: 'admin',
-    status: 'active',
-    lastLogin: '2024-01-15T10:30:00',
-    createdAt: '2024-01-01'
-  },
-  {
-    id: '2',
-    name: 'ADJAHO Agent',
-    email: 'agent@mairie-cotonou.bj',
-    role: 'agent',
-    status: 'active',
-    lastLogin: '2024-01-14T16:45:00',
-    createdAt: '2024-01-05'
-  },
-  {
-    id: '3',
-    name: 'GBENOU Finance',
-    email: 'finance@mairie-cotonou.bj',
-    role: 'finance',
-    status: 'active',
-    lastLogin: '2024-01-13T09:15:00',
-    createdAt: '2024-01-10'
-  },
-  {
-    id: '4',
-    name: 'DOSSOU Agent2',
-    email: 'agent2@mairie-cotonou.bj',
-    role: 'agent',
-    status: 'inactive',
-    lastLogin: '2024-01-10T14:20:00',
-    createdAt: '2024-01-08'
-  }
-];
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  is_active: boolean;
+  created_at: string;
+  created_by?: string;
+}
 
 const roles = [
   {
@@ -71,29 +44,100 @@ const roles = [
 ];
 
 export const UsersPage = () => {
+  const { user: currentUser } = useAuth();
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const filteredUsers = mockUsers.filter(user => {
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setUsers(data || []);
+    } catch (err: any) {
+      console.error('Error fetching users:', err);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les utilisateurs',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || (statusFilter === 'active' ? user.is_active : !user.is_active);
     
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <Badge variant="secondary" className="bg-success-light text-success">Actif</Badge>;
-      case 'inactive':
-        return <Badge variant="destructive">Inactif</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
+  const getStatusBadge = (isActive: boolean) => {
+    return isActive
+      ? <Badge variant="secondary" className="bg-success-light text-success">Actif</Badge>
+      : <Badge variant="destructive">Inactif</Badge>;
+  };
+
+  const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: !currentStatus })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Utilisateur mis à jour',
+        description: `L'utilisateur a été ${currentStatus ? 'désactivé' : 'activé'} avec succès`
+      });
+
+      fetchUsers();
+    } catch (err: any) {
+      toast({
+        title: 'Erreur',
+        description: err.message || 'Impossible de modifier l\'utilisateur',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const deleteUser = async (userId: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.admin.deleteUser(userId);
+      if (error) throw error;
+
+      toast({
+        title: 'Utilisateur supprimé',
+        description: 'L\'utilisateur a été supprimé avec succès'
+      });
+
+      fetchUsers();
+    } catch (err: any) {
+      toast({
+        title: 'Erreur',
+        description: err.message || 'Impossible de supprimer l\'utilisateur',
+        variant: 'destructive'
+      });
     }
   };
 
@@ -110,8 +154,8 @@ export const UsersPage = () => {
     }
   };
 
-  const activeUsers = mockUsers.filter(u => u.status === 'active').length;
-  const inactiveUsers = mockUsers.filter(u => u.status === 'inactive').length;
+  const activeUsers = users.filter(u => u.is_active).length;
+  const inactiveUsers = users.filter(u => !u.is_active).length;
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
@@ -135,7 +179,7 @@ export const UsersPage = () => {
                 <CardDescription>Total utilisateurs</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{mockUsers.length}</div>
+                <div className="text-2xl font-bold">{users.length}</div>
               </CardContent>
             </Card>
             <Card>
@@ -191,62 +235,7 @@ export const UsersPage = () => {
               </SelectContent>
             </Select>
             
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Nouvel utilisateur
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Créer un utilisateur</DialogTitle>
-                  <DialogDescription>
-                    Ajouter un nouvel utilisateur au système
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Nom complet</Label>
-                    <Input id="name" placeholder="Nom et prénom" />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="email@mairie-cotonou.bj" />
-                  </div>
-                  <div>
-                    <Label htmlFor="role">Rôle</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un rôle" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Administrateur</SelectItem>
-                        <SelectItem value="agent">Agent de saisie</SelectItem>
-                        <SelectItem value="finance">Responsable financier</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="password">Mot de passe temporaire</Label>
-                    <Input id="password" type="password" placeholder="Mot de passe" />
-                  </div>
-                  <Button 
-                    className="w-full"
-                    onClick={async () => {
-                      // Create user logic
-                      console.log('Créer utilisateur');
-                      // Simulate API call
-                      await new Promise(resolve => setTimeout(resolve, 1000));
-                      setIsDialogOpen(false);
-                      console.log('Utilisateur créé avec succès');
-                    }}
-                  >
-                    Créer l'utilisateur
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <CreateUserModal onUserCreated={fetchUsers} />
           </div>
 
           {/* Users Table */}
@@ -273,9 +262,9 @@ export const UsersPage = () => {
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell className="hidden sm:table-cell">{user.email}</TableCell>
                       <TableCell>{getRoleBadge(user.role)}</TableCell>
-                      <TableCell>{getStatusBadge(user.status)}</TableCell>
+                      <TableCell>{getStatusBadge(user.is_active)}</TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {new Date(user.lastLogin).toLocaleDateString('fr-FR')}
+                        {new Date(user.created_at).toLocaleDateString('fr-FR')}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
@@ -287,47 +276,41 @@ export const UsersPage = () => {
                               console.log('Modifier utilisateur', user.id);
                             }}
                             title="Modifier"
+                            disabled={user.id === currentUser?.id}
                           >
                             <Edit className="w-3 h-3" />
                           </Button>
-                          {user.status === 'active' ? (
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => {
-                                // Deactivate user logic
-                                console.log('Désactiver utilisateur', user.id);
-                              }}
-                              title="Désactiver"
-                            >
-                              <UserX className="w-3 h-3" />
-                            </Button>
-                          ) : (
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => {
-                                // Activate user logic
-                                console.log('Activer utilisateur', user.id);
-                              }}
-                              title="Activer"
-                            >
-                              <UserCheck className="w-3 h-3" />
-                            </Button>
+                          {user.id !== currentUser?.id && (
+                            <>
+                              {user.is_active ? (
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => toggleUserStatus(user.id, user.is_active)}
+                                  title="Désactiver"
+                                >
+                                  <UserX className="w-3 h-3" />
+                                </Button>
+                              ) : (
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => toggleUserStatus(user.id, user.is_active)}
+                                  title="Activer"
+                                >
+                                  <UserCheck className="w-3 h-3" />
+                                </Button>
+                              )}
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => deleteUser(user.id)}
+                                title="Supprimer"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </>
                           )}
-                          <Button 
-                            size="sm" 
-                            variant="destructive"
-                            onClick={() => {
-                              // Delete user logic
-                              if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-                                console.log('Supprimer utilisateur', user.id);
-                              }
-                            }}
-                            title="Supprimer"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
