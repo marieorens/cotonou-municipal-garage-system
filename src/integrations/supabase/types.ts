@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -118,6 +118,87 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_transactions: {
+        Row: {
+          administrative_fees: number | null
+          amount: number
+          created_at: string
+          currency: string
+          days_impounded: number | null
+          id: string
+          kkiapay_token: string | null
+          kkiapay_transaction_id: string | null
+          owner_id: string
+          payment_date: string | null
+          payment_method: string | null
+          penalty_fees: number | null
+          receipt_generated_at: string | null
+          receipt_number: string | null
+          receipt_url: string | null
+          status: string
+          storage_fees: number | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          administrative_fees?: number | null
+          amount: number
+          created_at?: string
+          currency?: string
+          days_impounded?: number | null
+          id?: string
+          kkiapay_token?: string | null
+          kkiapay_transaction_id?: string | null
+          owner_id: string
+          payment_date?: string | null
+          payment_method?: string | null
+          penalty_fees?: number | null
+          receipt_generated_at?: string | null
+          receipt_number?: string | null
+          receipt_url?: string | null
+          status?: string
+          storage_fees?: number | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          administrative_fees?: number | null
+          amount?: number
+          created_at?: string
+          currency?: string
+          days_impounded?: number | null
+          id?: string
+          kkiapay_token?: string | null
+          kkiapay_transaction_id?: string | null
+          owner_id?: string
+          payment_date?: string | null
+          payment_method?: string | null
+          penalty_fees?: number | null
+          receipt_generated_at?: string | null
+          receipt_number?: string | null
+          receipt_url?: string | null
+          status?: string
+          storage_fees?: number | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -219,29 +300,43 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          created_by: string | null
           email: string
           id: string
+          is_active: boolean
           name: string
           role: string
           updated_at: string
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           email: string
           id: string
+          is_active?: boolean
           name: string
           role: string
           updated_at?: string
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           email?: string
           id?: string
+          is_active?: boolean
           name?: string
           role?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       settings: {
         Row: {
@@ -343,7 +438,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_receipt_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
