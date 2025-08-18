@@ -1,21 +1,70 @@
-import { useState, useEffect } from 'react';
-import { Search, Download, Filter, AlertTriangle, Clock, TrendingUp, Calendar, Eye, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { CreditCard, Search, Filter, Download, Loader2, Eye, Calendar, AlertTriangle, Clock, ExternalLink } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { MockApiService } from '@/services/mockApi';
-import { Vehicle, Payment } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Extended vehicle type with financial data
-interface VehicleWithFinancialData extends Vehicle {
+interface PaymentTransaction {
+  id: string;
+  amount: number;
+  status: string;
+  payment_method: string;
+  payment_date: string;
+  receipt_number: string;
+  created_at: string;
+  storage_fees: number;
+  administrative_fees: number;
+  penalty_fees: number;
+  days_impounded: number;
+  vehicles: {
+    id: string;
+    license_plate: string;
+    make: string;
+    model: string;
+    color: string;
+    impound_date: string;
+    status: string;
+  };
+  owners: {
+    first_name: string;
+    last_name: string;
+    phone: string;
+    email: string;
+  };
+}
+
+interface VehicleWithFinancialData {
+  id: string;
+  license_plate: string;
+  make: string;
+  model: string;
+  color: string;
+  impound_date: string;
+  status: string;
   daysSinceImpound: number;
   storageFees: number;
   adminFees: number;
+  penaltyFees: number;
   totalDue: number;
   isPaid: boolean;
   amountPaid: number;
@@ -25,26 +74,80 @@ interface VehicleWithFinancialData extends Vehicle {
 
 export const PaymentsPage = () => {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [payments, setPayments] = useState<PaymentTransaction[]>([]);
+  const [vehicles, setVehicles] = useState<VehicleWithFinancialData[]>([]);
+  const [filteredVehicles, setFilteredVehicles] = useState<VehicleWithFinancialData[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [urgencyFilter, setUrgencyFilter] = useState<string>('all');
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleWithFinancialData | null>(null);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [payments, setPayments] = useState<Payment[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [vehiclesData, paymentsData] = await Promise.all([
-          MockApiService.getVehicles(),
-          MockApiService.getPayments()
-        ]);
-        setVehicles(vehiclesData.vehicles || []);
+        
+        // Fetch payments
+        const { data: paymentsData, error: paymentsError } = await supabase
+          .from('payment_transactions')
+          .select(`
+            *,
+            vehicles:vehicle_id (id, license_plate, make, model, color, impound_date, status),
+            owners:owner_id (first_name, last_name, phone, email)
+          `)
+          .order('created_at', { ascending: false });
+
+        if (paymentsError) throw paymentsError;
         setPayments(paymentsData || []);
+
+        // Fetch all vehicles to calculate financial data
+        const { data: vehiclesData, error: vehiclesError } = await supabase
+          .from('vehicles')
+          .select('*')
+          .order('impound_date', { ascending: false });
+
+        if (vehiclesError) throw vehiclesError;
+
+        // Calculate financial data for each vehicle
+        const vehiclesWithFinancialData = (vehiclesData || []).map(vehicle => {
+          const daysSinceImpound = Math.floor((new Date().getTime() - new Date(vehicle.impound_date).getTime()) / (1000 * 60 * 60 * 24));
+          const storageFees = daysSinceImpound * 2000; // 2000 FCFA par jour
+          const adminFees = 15000; // Frais administratifs fixes
+          const penaltyFees = daysSinceImpound > 30 ? 10000 : 0; // Pénalité après 30 jours
+          const totalDue = storageFees + adminFees + penaltyFees;
+          
+          const existingPayment = paymentsData?.find(p => p.vehicle_id === vehicle.id && p.status === 'completed');
+          const isPaid = !!existingPayment;
+          const amountPaid = existingPayment?.amount || 0;
+          const remainingAmount = isPaid ? Math.max(0, totalDue - amountPaid) : totalDue;
+          
+          const urgency = daysSinceImpound > 30 ? 'critical' : daysSinceImpound > 15 ? 'warning' : 'normal' as const;
+          
+          return {
+            ...vehicle,
+            daysSinceImpound,
+            storageFees,
+            adminFees,
+            penaltyFees,
+            totalDue,
+            isPaid,
+            amountPaid,
+            remainingAmount,
+            urgency
+          };
+        });
+
+        setVehicles(vehiclesWithFinancialData);
+        setFilteredVehicles(vehiclesWithFinancialData);
+
       } catch (error) {
-        console.error('Erreur lors du chargement des données:', error);
+        console.error('Error fetching data:', error);
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de charger les données financières',
+          variant: 'destructive',
+        });
       } finally {
         setLoading(false);
       }
@@ -53,48 +156,31 @@ export const PaymentsPage = () => {
     fetchData();
   }, []);
 
-  // Calculate financial data for vehicles
-  const vehiclesWithFinancialData = vehicles.map(vehicle => {
-    const daysSinceImpound = Math.floor((new Date().getTime() - new Date(vehicle.impound_date).getTime()) / (1000 * 60 * 60 * 24));
-    const storageFees = daysSinceImpound * 2000; // 2000 FCFA par jour
-    const adminFees = 15000; // Frais administratifs fixes
-    const totalDue = storageFees + adminFees;
-    
-    const existingPayment = payments.find(p => p.vehicle_id === vehicle.id);
-    const isPaid = !!existingPayment;
-    const amountPaid = existingPayment?.amount || 0;
-    const remainingAmount = isPaid ? Math.max(0, totalDue - amountPaid) : totalDue;
-    
-    const urgency = daysSinceImpound > 30 ? 'critical' : daysSinceImpound > 15 ? 'warning' : 'normal' as const;
-    
-    return {
-      ...vehicle,
-      daysSinceImpound,
-      storageFees,
-      adminFees,
-      totalDue,
-      isPaid,
-      amountPaid,
-      remainingAmount,
-      urgency
-    };
-  });
+  useEffect(() => {
+    let filtered = vehicles;
 
-  // Filter vehicles based on search and filters
-  const filteredVehicles = vehiclesWithFinancialData.filter(vehicle => {
-    const matchesSearch = 
-      vehicle.license_plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.model.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || 
-      (statusFilter === 'paid' && vehicle.isPaid) ||
-      (statusFilter === 'unpaid' && !vehicle.isPaid);
-    
-    const matchesUrgency = urgencyFilter === 'all' || vehicle.urgency === urgencyFilter;
-    
-    return matchesSearch && matchesStatus && matchesUrgency;
-  });
+    if (searchTerm) {
+      filtered = filtered.filter(vehicle =>
+        vehicle.license_plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        vehicle.model.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (statusFilter !== 'all') {
+      if (statusFilter === 'paid') {
+        filtered = filtered.filter(v => v.isPaid);
+      } else if (statusFilter === 'unpaid') {
+        filtered = filtered.filter(v => !v.isPaid);
+      }
+    }
+
+    if (urgencyFilter !== 'all') {
+      filtered = filtered.filter(v => v.urgency === urgencyFilter);
+    }
+
+    setFilteredVehicles(filtered);
+  }, [vehicles, searchTerm, statusFilter, urgencyFilter]);
 
   const formatCurrency = (amount: number) => {
     return `${amount.toLocaleString()} FCFA`;
@@ -118,10 +204,18 @@ export const PaymentsPage = () => {
   };
 
   // Calculate financial statistics
-  const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0);
-  const totalDue = vehiclesWithFinancialData.reduce((sum, v) => sum + v.remainingAmount, 0);
-  const unpaidVehicles = vehiclesWithFinancialData.filter(v => !v.isPaid).length;
-  const criticalVehicles = vehiclesWithFinancialData.filter(v => v.urgency === 'critical').length;
+  const totalRevenue = payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0);
+  const totalDue = vehicles.reduce((sum, v) => sum + v.remainingAmount, 0);
+  const unpaidVehicles = vehicles.filter(v => !v.isPaid).length;
+  const criticalVehicles = vehicles.filter(v => v.urgency === 'critical').length;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
@@ -188,7 +282,7 @@ export const PaymentsPage = () => {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
-            placeholder="Rechercher par référence, description..."
+            placeholder="Rechercher par immatriculation, marque..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9"
@@ -271,56 +365,51 @@ export const PaymentsPage = () => {
                   <TableHead className="min-w-[120px]">Montant dû</TableHead>
                   <TableHead className="hidden md:table-cell">Frais stockage</TableHead>
                   <TableHead className="min-w-[100px]">Statut</TableHead>
+                  <TableHead className="min-w-[100px]">Urgence</TableHead>
                   <TableHead className="min-w-[60px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
-                    Chargement des données...
-                  </TableCell>
-                </TableRow>
-              ) : filteredVehicles.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
-                    Aucun véhicule trouvé
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredVehicles.map((vehicle) => (
-                  <TableRow key={vehicle.id}>
-                    <TableCell className="font-medium">{vehicle.license_plate}</TableCell>
-                    <TableCell className="hidden sm:table-cell">{vehicle.make} {vehicle.model}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-muted-foreground" />
-                        {vehicle.daysSinceImpound}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-semibold">{formatCurrency(vehicle.remainingAmount)}</TableCell>
-                    <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                      {formatCurrency(vehicle.storageFees)}
-                    </TableCell>
-                    <TableCell>
-                      {getStatusBadge(vehicle.isPaid)}
-                    </TableCell>
-                    <TableCell>
-                      {getUrgencyBadge(vehicle.urgency)}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedVehicle(vehicle as VehicleWithFinancialData)}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
+              <TableBody>
+                {filteredVehicles.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8">
+                      Aucun véhicule trouvé
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
+                ) : (
+                  filteredVehicles.map((vehicle) => (
+                    <TableRow key={vehicle.id}>
+                      <TableCell className="font-medium">{vehicle.license_plate}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{vehicle.make} {vehicle.model}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-muted-foreground" />
+                          {vehicle.daysSinceImpound}
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-semibold">{formatCurrency(vehicle.remainingAmount)}</TableCell>
+                      <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
+                        {formatCurrency(vehicle.storageFees)}
+                      </TableCell>
+                      <TableCell>
+                        {getStatusBadge(vehicle.isPaid)}
+                      </TableCell>
+                      <TableCell>
+                        {getUrgencyBadge(vehicle.urgency)}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedVehicle(vehicle)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
             </Table>
           </div>
         </CardContent>
@@ -367,6 +456,12 @@ export const PaymentsPage = () => {
                     <span>Frais de stockage ({selectedVehicle.daysSinceImpound} jours × 2,000 FCFA):</span>
                     <span className="font-medium">{formatCurrency(selectedVehicle.storageFees)}</span>
                   </div>
+                  {selectedVehicle.penaltyFees > 0 && (
+                    <div className="flex justify-between">
+                      <span>Frais de pénalité:</span>
+                      <span className="font-medium">{formatCurrency(selectedVehicle.penaltyFees)}</span>
+                    </div>
+                  )}
                   <div className="border-t pt-2 flex justify-between font-semibold">
                     <span>Total à payer:</span>
                     <span>{formatCurrency(selectedVehicle.totalDue)}</span>

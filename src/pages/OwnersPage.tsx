@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Search, Filter, Phone, Mail, User, Car, History } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Search, Filter, Phone, Mail, User, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Table,
   TableBody,
@@ -15,53 +13,41 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Owner } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
-
-// Mock data
-const mockOwners: Owner[] = [
-  {
-    id: '1',
-    first_name: 'Jean',
-    last_name: 'ADJOVI',
-    phone: '+229 97 12 34 56',
-    email: 'jean.adjovi@gmail.com',
-    address: 'Quartier Akpakpa, Cotonou',
-    id_number: 'CI123456789',
-    id_type: 'cni',
-    created_at: '2024-01-15T10:30:00Z',
-    updated_at: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: '2',
-    first_name: 'Marie',
-    last_name: 'DOSSOU',
-    phone: '+229 96 87 65 43',
-    email: 'marie.dossou@yahoo.fr',
-    address: 'Quartier Godomey, Abomey-Calavi',
-    id_number: 'CI987654321',
-    id_type: 'cni',
-    created_at: '2024-01-10T14:20:00Z',
-    updated_at: '2024-01-16T09:15:00Z',
-  },
-  {
-    id: '3',
-    first_name: 'Ibrahim',
-    last_name: 'ZAKARI',
-    phone: '+229 95 11 22 33',
-    email: '',
-    address: 'Quartier Zongo, Cotonou',
-    id_number: 'P789123456',
-    id_type: 'passport',
-    created_at: '2024-01-08T08:45:00Z',
-    updated_at: '2024-01-12T16:30:00Z',
-  },
-];
+import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const OwnersPage = () => {
-  const { hasAnyRole } = useAuth();
-  const [owners, setOwners] = useState<Owner[]>(mockOwners);
-  const [filteredOwners, setFilteredOwners] = useState<Owner[]>(mockOwners);
+  const [loading, setLoading] = useState(true);
+  const [owners, setOwners] = useState<Owner[]>([]);
+  const [filteredOwners, setFilteredOwners] = useState<Owner[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const fetchOwners = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('owners')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setOwners((data || []) as Owner[]);
+        setFilteredOwners((data || []) as Owner[]);
+      } catch (error) {
+        console.error('Error fetching owners:', error);
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de charger la liste des propriétaires',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOwners();
+  }, []);
 
   useEffect(() => {
     let filtered = owners;
@@ -71,7 +57,7 @@ export const OwnersPage = () => {
         owner.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         owner.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         owner.phone.includes(searchTerm) ||
-        owner.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (owner.email && owner.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
         owner.id_number.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -88,30 +74,25 @@ export const OwnersPage = () => {
     }
   };
 
-  const canEditOwners = hasAnyRole(['admin', 'agent']);
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Propriétaires</h1>
-          <p className="text-muted-foreground">
-            Gestion de la base de données des propriétaires de véhicules
-          </p>
-        </div>
-        {canEditOwners && (
-          <Button 
-            className="bg-municipal-gradient hover:opacity-90 w-full sm:w-auto"
-            onClick={() => console.log('Créer nouveau propriétaire')}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Nouveau propriétaire
-          </Button>
-        )}
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Propriétaires</h1>
+        <p className="text-muted-foreground">
+          Gestion de la base de données des propriétaires de véhicules
+        </p>
       </div>
 
-      {/* Search & Filters */}
+      {/* Search */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -158,8 +139,8 @@ export const OwnersPage = () => {
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold">89%</div>
-            <p className="text-sm text-muted-foreground">Taux de contact</p>
+            <div className="text-2xl font-bold">{owners.length}</div>
+            <p className="text-sm text-muted-foreground">Total propriétaires</p>
           </CardContent>
         </Card>
       </div>
@@ -182,7 +163,6 @@ export const OwnersPage = () => {
                   <TableHead className="hidden md:table-cell min-w-[200px]">Adresse</TableHead>
                   <TableHead className="hidden lg:table-cell min-w-[150px]">Pièce d'identité</TableHead>
                   <TableHead className="hidden sm:table-cell">Date d'ajout</TableHead>
-                  <TableHead className="min-w-[120px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -191,7 +171,6 @@ export const OwnersPage = () => {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarImage src="" alt={`${owner.first_name} ${owner.last_name}`} />
                           <AvatarFallback>
                             {owner.first_name[0]}{owner.last_name[0]}
                           </AvatarFallback>
@@ -230,38 +209,15 @@ export const OwnersPage = () => {
                     <TableCell className="hidden sm:table-cell">
                       {new Date(owner.created_at).toLocaleDateString('fr-FR')}
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => console.log('Voir profil propriétaire', owner.id)}
-                          title="Voir profil"
-                        >
-                          <User className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => console.log('Voir véhicules propriétaire', owner.id)}
-                          title="Voir véhicules"
-                        >
-                          <Car className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => console.log('Voir historique propriétaire', owner.id)}
-                          title="Voir historique"
-                        >
-                          <History className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+            {filteredOwners.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                Aucun propriétaire trouvé
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

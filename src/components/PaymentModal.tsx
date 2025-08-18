@@ -16,6 +16,9 @@ declare global {
   }
 }
 
+// You need to add your KKIAPAY API key here
+const KKIAPAY_API_KEY = "your-kkiapay-api-key-here";
+
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -84,51 +87,61 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
       if (paymentError) throw paymentError;
 
-      // Initialize KKiAPay
-      const kkiapay = window.kkiapay;
-      kkiapay.init({
-        amount: amount,
-        position: "center",
-        callback: async (response: any) => {
-          // Payment successful
-          try {
-            const { error: updateError } = await supabase
-              .from('payment_transactions')
-              .update({
-                status: 'completed',
-                payment_date: new Date().toISOString(),
-                kkiapay_transaction_id: response.transactionId,
-                kkiapay_token: response.token
-              })
-              .eq('id', paymentData.id);
+      // Create KKIAPAY widget element
+      const widgetContainer = document.createElement('div');
+      widgetContainer.innerHTML = `
+        <kkiapay-widget 
+          amount="${amount}"
+          key="${KKIAPAY_API_KEY}"
+          position="center"
+          sandbox="true"
+          data='{"email":"${owner.email || 'noreply@cotonou.bj'}","name":"${owner.first_name} ${owner.last_name}","phone":"${owner.phone}"}'
+          callback="">
+        </kkiapay-widget>
+      `;
+      
+      document.body.appendChild(widgetContainer);
+      
+      // Add success callback
+      window.addEventListener('kkiapay.success', async (event: any) => {
+        try {
+          const { error: updateError } = await supabase
+            .from('payment_transactions')
+            .update({
+              status: 'completed',
+              payment_date: new Date().toISOString(),
+              kkiapay_transaction_id: event.detail.transactionId,
+              kkiapay_token: event.detail.token
+            })
+            .eq('id', paymentData.id);
 
-            if (updateError) throw updateError;
+          if (updateError) throw updateError;
 
-            setPaymentStatus('success');
-            toast({
-              title: 'Paiement réussi',
-              description: 'Le paiement a été traité avec succès. Votre reçu sera généré automatiquement.'
-            });
+          setPaymentStatus('success');
+          toast({
+            title: 'Paiement réussi',
+            description: 'Le paiement a été traité avec succès. Votre reçu sera généré automatiquement.'
+          });
 
-            // Generate receipt automatically
-            setTimeout(() => {
-              generateReceipt(paymentData);
-            }, 1000);
+          // Generate receipt automatically
+          setTimeout(() => {
+            generateReceipt(paymentData);
+          }, 1000);
 
-          } catch (err) {
-            console.error('Error updating payment:', err);
-            setPaymentStatus('failed');
-          }
-        },
-        data: {
-          email: owner.email || 'noreply@cotonou.bj',
-          name: `${owner.first_name} ${owner.last_name}`,
-          phone: owner.phone
-        },
-        theme: "#0891b2"
+          // Clean up widget
+          document.body.removeChild(widgetContainer);
+
+        } catch (err) {
+          console.error('Error updating payment:', err);
+          setPaymentStatus('failed');
+        }
       });
 
-      kkiapay.open();
+      // Add failure callback
+      window.addEventListener('kkiapay.failed', () => {
+        setPaymentStatus('failed');
+        document.body.removeChild(widgetContainer);
+      });
 
     } catch (err: any) {
       console.error('Payment error:', err);
