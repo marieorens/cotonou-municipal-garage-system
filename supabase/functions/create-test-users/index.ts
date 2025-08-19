@@ -24,6 +24,40 @@ serve(async (req) => {
       }
     )
 
+    console.log('Starting user cleanup and creation process...')
+
+    // Step 1: Delete all existing profiles first
+    console.log('Deleting all existing profiles...')
+    const { error: deleteProfilesError } = await supabaseAdmin
+      .from('profiles')
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
+
+    if (deleteProfilesError) {
+      console.error('Error deleting profiles:', deleteProfilesError)
+    }
+
+    // Step 2: Get all existing users and delete them
+    console.log('Getting all existing users...')
+    const { data: existingUsers, error: getUsersError } = await supabaseAdmin.auth.admin.listUsers()
+    
+    if (getUsersError) {
+      console.error('Error getting users:', getUsersError)
+    } else {
+      console.log(`Found ${existingUsers.users.length} existing users to delete`)
+      
+      // Delete each user
+      for (const user of existingUsers.users) {
+        console.log(`Deleting user: ${user.email}`)
+        const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id)
+        if (deleteError) {
+          console.error(`Error deleting user ${user.email}:`, deleteError)
+        }
+      }
+    }
+
+    // Step 3: Create new test users
+    console.log('Creating new test users...')
     const testUsers = [
       {
         email: 'admin@test.com',
@@ -48,6 +82,8 @@ serve(async (req) => {
     const results = []
 
     for (const user of testUsers) {
+      console.log(`Creating user: ${user.email}`)
+      
       // Create user in auth
       const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email: user.email,
@@ -65,6 +101,8 @@ serve(async (req) => {
         continue
       }
 
+      console.log(`User ${user.email} created with ID: ${authData.user.id}`)
+
       // Create profile
       const { error: profileError } = await supabaseAdmin
         .from('profiles')
@@ -80,12 +118,24 @@ serve(async (req) => {
         console.error(`Error creating profile for ${user.email}:`, profileError)
         results.push({ email: user.email, error: profileError.message })
       } else {
-        results.push({ email: user.email, success: true, password: user.password })
+        console.log(`Profile created for ${user.email}`)
+        results.push({ 
+          email: user.email, 
+          password: user.password,
+          name: user.name,
+          role: user.role,
+          success: true 
+        })
       }
     }
 
+    console.log('User cleanup and creation completed')
+
     return new Response(
-      JSON.stringify({ results }),
+      JSON.stringify({ 
+        message: 'Users cleanup and creation completed',
+        results 
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
