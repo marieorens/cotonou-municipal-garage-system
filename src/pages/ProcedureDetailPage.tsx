@@ -26,22 +26,47 @@ export const ProcedureDetailPage = () => {
       
       try {
         setLoading(true);
-        // Get all procedures and find the one we need
-        const procedures = await MockApiService.getProcedures();
-        const currentProcedure = procedures.find(p => p.id === procedureId);
+        // Get procedure details
+        const { data: procedure, error: procedureError } = await supabase
+          .from('procedures')
+          .select('*')
+          .eq('id', procedureId)
+          .single();
         
-        if (!currentProcedure) {
+        if (procedureError || !procedure) {
           toast.error('Procédure non trouvée');
           navigate('/app/procedures');
           return;
         }
         
-        setProcedure(currentProcedure);
+        setProcedure({ ...procedure, documents: [] } as Procedure);
         
         // Get vehicle details
-        const vehicleData = await MockApiService.getVehicle(currentProcedure.vehicle_id);
-        setVehicle(vehicleData.vehicle);
-        setOwner(vehicleData.owner);
+        const { data: vehicle, error: vehicleError } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('id', procedure.vehicle_id)
+          .single();
+        
+        if (vehicleError || !vehicle) {
+          toast.error('Véhicule non trouvé');
+          return;
+        }
+        
+        setVehicle(vehicle as Vehicle);
+        
+        // Get owner details if vehicle has owner
+        if (vehicle.owner_id) {
+          const { data: owner, error: ownerError } = await supabase
+            .from('owners')
+            .select('*')
+            .eq('id', vehicle.owner_id)
+            .single();
+          
+          if (!ownerError && owner) {
+            setOwner(owner as Owner);
+          }
+        }
         
       } catch (error) {
         console.error('Erreur lors du chargement de la procédure:', error);

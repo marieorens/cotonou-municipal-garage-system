@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Vehicle, Owner } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
-import { MockApiService } from '@/services/mockApi';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import municipalBuilding from '@/assets/cotonou-municipal-building.jpg';
 
@@ -81,9 +81,26 @@ export const VehicleDetailPage = () => {
       
       try {
         setIsLoading(true);
-        const response = await MockApiService.getVehicle(id);
-        setVehicle(response.vehicle);
-        setOwner(response.owner);
+        const { data: vehicle, error: vehicleError } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (vehicleError) throw vehicleError;
+        setVehicle(vehicle as Vehicle);
+        
+        if (vehicle?.owner_id) {
+          const { data: owner, error: ownerError } = await supabase
+            .from('owners')
+            .select('*')
+            .eq('id', vehicle.owner_id)
+            .single();
+          
+          if (!ownerError && owner) {
+            setOwner(owner as Owner);
+          }
+        }
       } catch (error) {
         console.error('Failed to fetch vehicle:', error);
         toast({

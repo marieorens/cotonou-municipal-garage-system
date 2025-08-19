@@ -134,7 +134,7 @@ export const PaymentsPage = () => {
             isPaid,
             amountPaid,
             remainingAmount,
-            urgency
+            urgency: urgency as 'warning' | 'normal' | 'critical'
           };
         });
 

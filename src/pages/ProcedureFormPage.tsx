@@ -52,10 +52,13 @@ export const ProcedureFormPage = () => {
     const fetchVehicles = async () => {
       try {
         setLoadingVehicles(true);
-        const vehiclesData = await MockApiService.getVehicles();
-        // Only show impounded vehicles that don't have active procedures
-        const availableVehicles = vehiclesData.vehicles.filter(v => v.status === 'impounded');
-        setVehicles(availableVehicles);
+        const { data: vehiclesData, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('status', 'impounded');
+        
+        if (error) throw error;
+        setVehicles((vehiclesData || []) as Vehicle[]);
       } catch (error) {
         console.error('Erreur lors du chargement des véhicules:', error);
         toast.error('Erreur lors du chargement des véhicules');
@@ -139,7 +142,16 @@ export const ProcedureFormPage = () => {
         // Update existing procedure logic would go here
         toast.success('Procédure mise à jour avec succès');
       } else {
-        await MockApiService.createProcedure(procedureData);
+        const { error } = await supabase
+          .from('procedures')
+          .insert({
+            vehicle_id: data.vehicle_id,
+            type: data.type,
+            created_by: user?.id,
+            fees_calculated: estimatedFees
+          });
+        
+        if (error) throw error;
         toast.success('Procédure créée avec succès');
       }
       

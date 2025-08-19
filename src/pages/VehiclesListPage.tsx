@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/table';
 import { Vehicle, VehicleStatus, VehicleType } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
-import { MockApiService } from '@/services/mockApi';
+import { supabase } from '@/integrations/supabase/client';
 
 export const VehiclesListPage = () => {
   const { hasAnyRole } = useAuth();
@@ -31,9 +31,14 @@ export const VehiclesListPage = () => {
     const fetchVehicles = async () => {
       try {
         setLoading(true);
-        const vehiclesData = await MockApiService.getVehicles();
-        setVehicles(vehiclesData.vehicles);
-        setFilteredVehicles(vehiclesData.vehicles);
+        const { data: vehiclesData, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .order('impound_date', { ascending: false });
+        
+        if (error) throw error;
+        setVehicles((vehiclesData || []) as Vehicle[]);
+        setFilteredVehicles((vehiclesData || []) as Vehicle[]);
       } catch (error) {
         console.error('Erreur lors du chargement des véhicules:', error);
       } finally {
