@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Car, User, Calendar, CreditCard, FileText, ArrowLeft } from 'lucide-react';
 import { PaymentModal } from '@/components/PaymentModal';
-import { supabase } from '@/integrations/supabase/client';
+import { mockService } from '@/services/mockService';
 import { Vehicle, Owner } from '@/types';
 import { toast } from '@/hooks/use-toast';
 

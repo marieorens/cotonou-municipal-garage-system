@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Notification } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { mockService } from '@/services/mockService';
 
 const notificationTemplates = [
   {
@@ -45,12 +45,8 @@ export const NotificationsPage = () => {
     const fetchNotifications = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('notifications')
-          .select('*')
-          .order('sent_at', { ascending: false });
-        if (error) throw error;
-        setNotifications((data as any) || []);
+        const data = await mockService.getNotifications();
+        setNotifications(data || []);
       } catch (error) {
         console.error('Erreur lors du chargement des notifications:', error);
       } finally {

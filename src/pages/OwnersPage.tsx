@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/table';
 import { Owner } from '@/types';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { mockService } from '@/services/mockService';
 
 export const OwnersPage = () => {
   const [loading, setLoading] = useState(true);
@@ -26,14 +26,9 @@ export const OwnersPage = () => {
     const fetchOwners = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('owners')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        setOwners((data || []) as Owner[]);
-        setFilteredOwners((data || []) as Owner[]);
+        const data = await mockService.getOwners();
+        setOwners(data);
+        setFilteredOwners(data);
       } catch (error) {
         console.error('Error fetching owners:', error);
         toast({

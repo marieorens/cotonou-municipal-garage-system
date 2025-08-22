@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { supabase } from '@/integrations/supabase/client';
+import { mockService } from '@/services/mockService';
 import { Procedure } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -22,13 +22,8 @@ export const ProceduresPage = () => {
     const fetchProcedures = async () => {
       try {
         setLoading(true);
-        const { data: proceduresData, error } = await supabase
-          .from('procedures')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        setProcedures((proceduresData || []).map(p => ({ ...p, documents: [] } as Procedure)));
+        const proceduresData = await mockService.getProcedures();
+        setProcedures(proceduresData);
       } catch (error) {
         console.error('Erreur lors du chargement des procédures:', error);
       } finally {

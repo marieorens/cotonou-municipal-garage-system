@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { supabase } from '@/integrations/supabase/client';
+import { mockService } from '@/services/mockService';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -88,26 +88,23 @@ export const PaymentsPage = () => {
       try {
         setLoading(true);
         
-        // Fetch payments
-        const { data: paymentsData, error: paymentsError } = await supabase
-          .from('payment_transactions')
-          .select(`
-            *,
-            vehicles:vehicle_id (id, license_plate, make, model, color, impound_date, status),
-            owners:owner_id (first_name, last_name, phone, email)
-          `)
-          .order('created_at', { ascending: false });
-
-        if (paymentsError) throw paymentsError;
-        setPayments(paymentsData || []);
-
-        // Fetch all vehicles to calculate financial data
-        const { data: vehiclesData, error: vehiclesError } = await supabase
-          .from('vehicles')
-          .select('*')
-          .order('impound_date', { ascending: false });
-
-        if (vehiclesError) throw vehiclesError;
+        // Fetch payments and vehicles with mock service
+        const paymentsData = await mockService.getPayments();
+        const vehiclesData = await mockService.getVehicles();
+        
+        // Convert payments to PaymentTransaction format
+        const paymentTransactions = paymentsData.map(p => ({
+          ...p,
+          status: 'completed',
+          receipt_number: `RECT-${p.id}`,
+          storage_fees: 0,
+          administrative_fees: 0,
+          penalty_fees: 0,
+          days_impounded: 0,
+          vehicles: { id: p.vehicle_id, license_plate: '', make: '', model: '', color: '', impound_date: '', status: '' },
+          owners: { first_name: '', last_name: '', phone: '', email: '' }
+        }));
+        setPayments(paymentTransactions);
 
         // Calculate financial data for each vehicle
         const vehiclesWithFinancialData = (vehiclesData || []).map(vehicle => {
@@ -117,7 +114,7 @@ export const PaymentsPage = () => {
           const penaltyFees = daysSinceImpound > 30 ? 10000 : 0; // Pénalité après 30 jours
           const totalDue = storageFees + adminFees + penaltyFees;
           
-          const existingPayment = paymentsData?.find(p => p.vehicle_id === vehicle.id && p.status === 'completed');
+          const existingPayment = paymentsData?.find(p => p.vehicle_id === vehicle.id);
           const isPaid = !!existingPayment;
           const amountPaid = existingPayment?.amount || 0;
           const remainingAmount = isPaid ? Math.max(0, totalDue - amountPaid) : totalDue;

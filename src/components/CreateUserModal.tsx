@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Plus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { mockService } from '@/services/mockService';
 import { toast } from '@/hooks/use-toast';
 
 interface CreateUserModalProps {
@@ -37,49 +37,27 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ onUserCreated 
     setError('');
 
     try {
-      // Create user in Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      // Create user with mock service
+      await mockService.createUser({
+        name: formData.name,
         email: formData.email,
-        password: formData.password,
-        email_confirm: true,
-        user_metadata: {
-          name: formData.name,
-          role: formData.role
-        }
+        role: formData.role
       });
 
-      if (authError) throw authError;
+      toast({
+        title: 'Utilisateur créé avec succès',
+        description: `L'utilisateur ${formData.name} a été créé.`
+      });
 
-      if (authData.user) {
-        // Create profile manually
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            name: formData.name,
-            email: formData.email,
-            role: formData.role,
-            created_by: user?.id,
-            is_active: true
-          });
-
-        if (profileError) throw profileError;
-
-        toast({
-          title: 'Utilisateur créé avec succès',
-          description: `L'utilisateur ${formData.name} a été créé.`
-        });
-
-        // Reset form and close modal
-        setFormData({
-          name: '',
-          email: '',
-          password: '',
-          role: 'agent'
-        });
-        setIsOpen(false);
-        onUserCreated();
-      }
+      // Reset form and close modal
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        role: 'agent'
+      });
+      setIsOpen(false);
+      onUserCreated();
     } catch (err: any) {
       setError(err.message || 'Erreur lors de la création de l\'utilisateur');
     } finally {

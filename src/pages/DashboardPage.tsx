@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { DashboardStats, Vehicle } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { mockService } from '@/services/mockService';
 
 export const DashboardPage = () => {
   const { user } = useAuth();
@@ -18,50 +18,22 @@ export const DashboardPage = () => {
       try {
         setLoading(true);
         
-        // Fetch vehicles
-        const { data: vehiclesData, error: vehiclesError } = await supabase
-          .from('vehicles')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(5);
-
-        if (vehiclesError) throw vehiclesError;
-        setRecentVehicles((vehiclesData || []) as Vehicle[]);
-
-        // Calculate dashboard stats
-        const { data: allVehicles, error: statsError } = await supabase
-          .from('vehicles')
-          .select('status');
-
-        if (statsError) throw statsError;
-
-        const { data: paymentsData, error: paymentsError } = await supabase
-          .from('payment_transactions')
-          .select('amount, created_at')
-          .eq('status', 'completed')
-          .gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString());
-
-        if (paymentsError) throw paymentsError;
-
-        const vehiclesByStatus = allVehicles?.reduce((acc, vehicle) => {
-          acc[vehicle.status] = (acc[vehicle.status] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>) || {};
-
-        const monthlyRevenue = paymentsData?.reduce((sum, payment) => sum + Number(payment.amount), 0) || 0;
-
+        const statsData = await mockService.getDashboardStats();
+        const vehicles = await mockService.getVehicles();
+        
+        setRecentVehicles(vehicles.slice(0, 5));
         setStats({
-          total_vehicles: allVehicles?.length || 0,
+          total_vehicles: statsData.totalVehicles,
           vehicles_by_status: {
-            impounded: vehiclesByStatus.impounded || 0,
-            claimed: vehiclesByStatus.claimed || 0,
-            sold: vehiclesByStatus.sold || 0,
-            destroyed: vehiclesByStatus.destroyed || 0,
-            pending_destruction: vehiclesByStatus.pending_destruction || 0,
+            impounded: statsData.impoundedVehicles,
+            claimed: statsData.claimedVehicles,
+            sold: 0,
+            destroyed: 0,
+            pending_destruction: 0,
           },
-          monthly_revenue: monthlyRevenue,
-          recent_payments: [],
-          pending_procedures: 0, // TODO: Calculate from procedures table
+          monthly_revenue: statsData.totalRevenue,
+          recent_payments: statsData.recentPayments || [],
+          pending_procedures: statsData.pendingProcedures,
         });
         
       } catch (error) {

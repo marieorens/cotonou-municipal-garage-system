@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, CreditCard, Smartphone, AlertCircle, CheckCircle } from 'lucide-react';
 import { Vehicle, Owner } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
+import { mockService } from '@/services/mockService';
 import { toast } from '@/hooks/use-toast';
 
 declare global {
@@ -67,25 +67,14 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
     setPaymentStatus('processing');
 
     try {
-      // Create payment record in database
-      const { data: paymentData, error: paymentError } = await supabase
-        .from('payment_transactions')
-        .insert({
-          vehicle_id: vehicle.id,
-          owner_id: owner.id,
-          amount: amount,
-          currency: 'XOF',
-          status: 'pending',
-          storage_fees: breakdown.storageFees,
-          administrative_fees: breakdown.adminFees,
-          penalty_fees: breakdown.penaltyFees,
-          days_impounded: breakdown.daysImpounded,
-          payment_method: method
-        })
-        .select()
-        .single();
-
-      if (paymentError) throw paymentError;
+      // Create payment record with mock service
+      const paymentData = await mockService.createPayment({
+        vehicle_id: vehicle.id,
+        owner_id: owner.id,
+        amount,
+        payment_method: method,
+        description: `Paiement pour véhicule ${vehicle.license_plate}`
+      });
 
       // Create KKIAPAY widget element
       const widgetContainer = document.createElement('div');
@@ -105,17 +94,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       // Add success callback
       window.addEventListener('kkiapay.success', async (event: any) => {
         try {
-          const { error: updateError } = await supabase
-            .from('payment_transactions')
-            .update({
-              status: 'completed',
-              payment_date: new Date().toISOString(),
-              kkiapay_transaction_id: event.detail.transactionId,
-              kkiapay_token: event.detail.token
-            })
-            .eq('id', paymentData.id);
-
-          if (updateError) throw updateError;
+          // Simulate payment completion
+          setPaymentStatus('success');
 
           setPaymentStatus('success');
           toast({

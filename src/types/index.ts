@@ -72,7 +72,7 @@ export interface Payment {
   updated_at: string;
 }
 
-export type PaymentMethod = 'cash' | 'bank_transfer' | 'mobile_money';
+export type PaymentMethod = 'cash' | 'bank_transfer' | 'mobile_money' | 'card';
 
 export interface Procedure {
   id: string;

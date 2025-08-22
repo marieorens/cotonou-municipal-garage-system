@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Vehicle, Owner } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { mockService } from '@/services/mockService';
 import { useToast } from '@/hooks/use-toast';
 import municipalBuilding from '@/assets/cotonou-municipal-building.jpg';
 
