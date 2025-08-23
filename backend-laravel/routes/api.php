@@ -8,6 +8,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProcedureController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -52,4 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Settings
     Route::get('settings', [SettingController::class, 'index']);
     Route::put('settings', [SettingController::class, 'update']);
+
+    // Dashboard
+    Route::get('dashboard/stats', [DashboardController::class, 'index']);
 });
